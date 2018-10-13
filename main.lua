@@ -6,7 +6,7 @@
 
 local widget = require( "widget" )
 
--- top menu section - yane
+-- top 
 
 local function handleTabBarEvent( event )
     print( event.target.id ) 
@@ -157,4 +157,3 @@ end
 
 hideButtons(phraseButtons)
 showButtons(mainMenuButtons)
-
