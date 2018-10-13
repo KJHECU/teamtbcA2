@@ -1,4 +1,57 @@
+-----------------------------------------------------------------------------------------
+--
+-- main.lua
+--
+-----------------------------------------------------------------------------------------
+
 local widget = require( "widget" )
+
+-- top menu section - yane
+
+local function handleTabBarEvent( event )
+    print( event.target.id ) 
+end
+ 
+-- Configure tab buttons
+local tabButtons = {
+    {
+        width = 40, 
+        height = 50,
+        defaultFile = "baseline_menu_white_18dp.png",
+        overFile = "baseline_menu_white_18dp.png",
+        id = "tab1",
+        labelXOffset = -20,
+        onPress = handleTabBarEvent
+    },
+    {
+        width = 180,
+        height = 70,
+        --label = "App Name",
+        defaultFile = "app_name_28.png",
+        overFile = "app_name_28.png",
+        id = "tab2",
+        onPress = handleTabBarEvent
+    } 
+}
+ 
+-- Create the widget
+local tabBar = widget.newTabBar(
+    {
+        backgroundFile = "tab_bar_background.png",
+        tabSelectedLeftFile = "transparent_image.png", 
+    	tabSelectedRightFile = "transparent_image.png",  
+    	tabSelectedMiddleFile = "transparent_image.png",
+    	tabSelectedFrameWidth = 1,
+    	tabSelectedFrameHeight = 1,
+        top = display.screenOriginY + 50;
+        height = 52,
+        width = display.contentWidth,
+        --label = "App Name",
+        buttons = tabButtons
+    }
+)
+
+-- end top menu section
 
 -- array of Widgets to show the buttons
 local buttons
@@ -104,3 +157,4 @@ end
 
 hideButtons(phraseButtons)
 showButtons(mainMenuButtons)
+
