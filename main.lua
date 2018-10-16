@@ -12,7 +12,17 @@ background.anchorY = 0
 background:scale(0.5, 0.72)
 
 local widget = require( "widget" )
- 
+local sqlite3 = require( "sqlite3" )
+local path = system.pathForFile( "data.db", system.ResourceDirectory )
+local db = sqlite3.open( path )  
+
+-- Handle the "applicationExit" event to close the database
+local function onSystemEvent( event )
+    if ( event.type == "applicationExit" ) then             
+        db:close()
+    end
+end
+
 -- Configure tab buttons
 local tabButtons = {
     {
@@ -81,10 +91,10 @@ local function handleInput( event )
 end
 
 function loginAccepted()
-  return (txtUsername.text == "user" 
-    and txtPassword.text == "user")
-    or (txtUsername.text == "admin" 
-    and txtPassword.text == "admin")
+  query = [[SELECT * FROM user WHERE username="]] .. txtUsername.text .. [["]]
+  for row in db:nrows(query) do
+    return row.password == txtPassword.text
+  end
 end
 
 -- utility to make buttons
@@ -199,8 +209,8 @@ phraseButtons = {
   }
   
 loginButtons = {
-		addButton( 10, display.contentWidth/2, 2*display.contentHeight/3.5, display.contentWidth, display.contentHeight/10, false, 'Login'),
-		addButton( 11, display.contentWidth/2, 2*display.contentHeight/2.8, display.contentWidth, display.contentHeight/10, false, 'Register'),
+		addButton( 10, display.contentWidth/2, 6*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Login'),
+		addButton( 11, display.contentWidth/2, 7*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Register'),
     txtPassword,
     txtUsername,
     labelPassword,
