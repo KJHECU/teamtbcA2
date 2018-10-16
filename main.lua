@@ -4,13 +4,14 @@
 --
 -----------------------------------------------------------------------------------------
 
+-- background image properties
+
+local background = display.newImage("Background.jpg")
+background.anchorX = 0
+background.anchorY = 0
+background:scale(0.5, 0.72)
+
 local widget = require( "widget" )
-
--- top menu section - yane
-
-local function handleTabBarEvent( event )
-    print( event.target.id ) 
-end
  
 -- Configure tab buttons
 local tabButtons = {
@@ -21,7 +22,7 @@ local tabButtons = {
         overFile = "baseline_menu_white_18dp.png",
         id = "tab1",
         labelXOffset = -20,
-        onPress = handleTabBarEvent
+        onPress = handleInput
     },
     {
         width = 180,
@@ -30,7 +31,7 @@ local tabButtons = {
         defaultFile = "app_name_28.png",
         overFile = "app_name_28.png",
         id = "tab2",
-        onPress = handleTabBarEvent
+        onPress = handleInput
     } 
 }
  
@@ -43,7 +44,11 @@ local tabBar = widget.newTabBar(
         tabSelectedMiddleFile = "transparent_image.png",
         tabSelectedFrameWidth = 1,
         tabSelectedFrameHeight = 1,
+<<<<<<< HEAD
         top = -53;
+=======
+        top = display.screenOriginY - 10;
+>>>>>>> master
         height = 52,
         width = display.contentWidth,
         --label = "App Name",
@@ -67,6 +72,9 @@ local function handleInput( event )
   elseif id == 5 then
     hideButtons(mainMenuButtons)
     showButtons(phraseButtons)
+  elseif id == 10 then
+    hideButtons(loginButtons)
+    showButtons(mainMenuButtons)
   end
 end
 
@@ -107,15 +115,55 @@ local function addButton( ID, x, y, width, height, isIcon, label )
 	return button
 end
 
-local homeButton = display.newImage("home_white_192x192.png")
+
+homeButton = display.newImage("home_white_192x192.png")
   homeButton:scale(0.22, 0.22)
   homeButton.y = display.contentHeight + 10
   homeButton.x = 9.3*display.contentWidth/10
+  homeButton.isVisible = false
 
-local panicSettingsButton = display.newImage("User-Profile.png")
+panicSettingsButton = display.newImage("User-Profile.png")
   panicSettingsButton:scale(0.12, 0.12)
   panicSettingsButton.y = display.contentHeight + 10
   panicSettingsButton.x = 7.75*display.contentWidth/10
+  panicSettingsButton.isVisible = false
+  
+  -- login feature which is enabled by default --
+
+-- username capture
+
+txtUsername = native.newTextField(0,0,200,30)
+labelUsername = display.newText( "Username", 265, 85, 0, 0, "Roboto-Medium.ttf", 18 )
+labelUsername:setFillColor ( black )
+txtUsername.anchorX = 0
+txtUsername.anchorY = 0
+txtUsername.x = 10
+txtUsername.y = 70
+txtUsername:setTextColor(0,0,0)
+--set input type
+txtUsername.inputType = "default"
+--define the placeholder
+txtUsername.placeholder = "-- insert username --"
+--set font
+txtUsername.font = native.newFont("Roboto-Medium.ttf", 12)
+native.setKeyboardFocus(txtUsername)
+
+-- password capture
+txtPassword = native.newTextField(0,0,200,30)
+labelPassword = display.newText( "Password", 265, 135, 0, 0, "Roboto-Medium.ttf", 18 )
+labelPassword:setFillColor ( black )
+txtPassword.anchorX = 0
+txtPassword.anchorY = 0
+txtPassword.x = 10
+txtPassword.y = 120
+txtPassword:setTextColor(0,0,0)
+txtPassword.isSecure = true
+--set input type
+txtPassword.inputType = "default"
+--define the placeholder
+txtPassword.placeholder = "-- insert password --"
+--set font
+txtPassword.font = native.newFont(native.systemFont, 12)
   
 currentButtons = {}
 
@@ -140,7 +188,16 @@ phraseButtons = {
 		addButton( 8, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Legal Phrases'), 
 		addButton( 9, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Set Favourite Phrases'), 
   }
-
+  
+loginButtons = {
+		addButton( 10, display.contentWidth/2, 2*display.contentHeight/3.5, display.contentWidth, display.contentHeight/10, false, 'Login'),
+		addButton( 11, display.contentWidth/2, 2*display.contentHeight/2.8, display.contentWidth, display.contentHeight/10, false, 'Register'),
+    txtPassword,
+    txtUsername,
+    labelPassword,
+    labelUsername
+}
+  
 function showButtons(buttons)
     for _, button in pairs(buttons) do
       button.isVisible = true
@@ -156,5 +213,6 @@ function hideButtons(buttons)
 end
 
 hideButtons(phraseButtons)
-showButtons(mainMenuButtons)
-
+hideButtons(menuBarButtons)
+hideButtons(mainMenuButtons)
+showButtons(loginButtons)
