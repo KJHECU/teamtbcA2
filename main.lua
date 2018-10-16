@@ -44,11 +44,8 @@ local tabBar = widget.newTabBar(
         tabSelectedMiddleFile = "transparent_image.png",
         tabSelectedFrameWidth = 1,
         tabSelectedFrameHeight = 1,
-<<<<<<< HEAD
-        top = -53;
-=======
-        top = display.screenOriginY - 10;
->>>>>>> master
+        top = -53,
+        top = display.screenOriginY - 10,
         height = 52,
         width = display.contentWidth,
         --label = "App Name",
