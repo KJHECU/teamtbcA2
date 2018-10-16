@@ -12,7 +12,17 @@ background.anchorY = 0
 background:scale(0.5, 0.72)
 
 local widget = require( "widget" )
- 
+local sqlite3 = require( "sqlite3" )
+local path = system.pathForFile( "data.db", system.ResourceDirectory )
+local db = sqlite3.open( path )  
+
+-- Handle the "applicationExit" event to close the database
+local function onSystemEvent( event )
+    if ( event.type == "applicationExit" ) then             
+        db:close()
+    end
+end
+
 -- Configure tab buttons
 local tabButtons = {
     {
@@ -44,7 +54,8 @@ local tabBar = widget.newTabBar(
         tabSelectedMiddleFile = "transparent_image.png",
         tabSelectedFrameWidth = 1,
         tabSelectedFrameHeight = 1,
-        top = display.screenOriginY - 10;
+        top = -53,
+        top = display.screenOriginY - 10,
         height = 52,
         width = display.contentWidth,
         --label = "App Name",
@@ -65,12 +76,24 @@ local function handleInput( event )
   if id == 2 then
     hideButtons(currentButtons)
     showButtons(mainMenuButtons)
+    showButtons(menuBarButtons)
   elseif id == 5 then
     hideButtons(mainMenuButtons)
     showButtons(phraseButtons)
+    showButtons(menuBarButtons)
   elseif id == 10 then
-    hideButtons(loginButtons)
-    showButtons(mainMenuButtons)
+    if loginAccepted() then
+      hideButtons(loginButtons)
+      showButtons(mainMenuButtons)
+      showButtons(menuBarButtons)
+    end
+  end
+end
+
+function loginAccepted()
+  query = [[SELECT * FROM user WHERE username="]] .. txtUsername.text .. [["]]
+  for row in db:nrows(query) do
+    return row.password == txtPassword.text
   end
 end
 
@@ -116,13 +139,11 @@ homeButton = display.newImage("home_white_192x192.png")
   homeButton:scale(0.22, 0.22)
   homeButton.y = display.contentHeight + 10
   homeButton.x = 9.3*display.contentWidth/10
-  homeButton.isVisible = false
 
 panicSettingsButton = display.newImage("User-Profile.png")
   panicSettingsButton:scale(0.12, 0.12)
   panicSettingsButton.y = display.contentHeight + 10
   panicSettingsButton.x = 7.75*display.contentWidth/10
-  panicSettingsButton.isVisible = false
   
   -- login feature which is enabled by default --
 
@@ -168,7 +189,9 @@ countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeig
 menuBarButtons = {
     addButton( 1, display.contentWidth/2, display.contentHeight + 10, display.contentWidth/3, display.contentHeight/12, false, 'Panic Button'), 
     addButton( 2, homeButton.x, homeButton.y, homeButton.width*0.22, homeButton.height*0.22, true, homeButton ),
-    addButton( 3, panicSettingsButton.x, panicSettingsButton.y, panicSettingsButton.width*0.12, panicSettingsButton.height*0.12, true, panicSettingsButton )
+    addButton( 3, panicSettingsButton.x, panicSettingsButton.y, panicSettingsButton.width*0.12, panicSettingsButton.height*0.12, true, panicSettingsButton ),
+    homeButton,
+    panicSettingsButton
   }
   
 mainMenuButtons = {
@@ -186,8 +209,8 @@ phraseButtons = {
   }
   
 loginButtons = {
-		addButton( 10, display.contentWidth/2, 2*display.contentHeight/3.5, display.contentWidth, display.contentHeight/10, false, 'Login'),
-		addButton( 11, display.contentWidth/2, 2*display.contentHeight/2.8, display.contentWidth, display.contentHeight/10, false, 'Register'),
+		addButton( 10, display.contentWidth/2, 6*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Login'),
+		addButton( 11, display.contentWidth/2, 7*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Register'),
     txtPassword,
     txtUsername,
     labelPassword,
