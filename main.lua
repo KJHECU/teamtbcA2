@@ -66,13 +66,25 @@ local function handleInput( event )
   if id == 2 then
     hideButtons(currentButtons)
     showButtons(mainMenuButtons)
+    showButtons(menuBarButtons)
   elseif id == 5 then
     hideButtons(mainMenuButtons)
     showButtons(phraseButtons)
+    showButtons(menuBarButtons)
   elseif id == 10 then
-    hideButtons(loginButtons)
-    showButtons(mainMenuButtons)
+    if loginAccepted() then
+      hideButtons(loginButtons)
+      showButtons(mainMenuButtons)
+      showButtons(menuBarButtons)
+    end
   end
+end
+
+function loginAccepted()
+  return (txtUsername.text == "user" 
+    and txtPassword.text == "user")
+    or (txtUsername.text == "admin" 
+    and txtPassword.text == "admin")
 end
 
 -- utility to make buttons
@@ -117,13 +129,11 @@ homeButton = display.newImage("home_white_192x192.png")
   homeButton:scale(0.22, 0.22)
   homeButton.y = display.contentHeight + 10
   homeButton.x = 9.3*display.contentWidth/10
-  homeButton.isVisible = false
 
 panicSettingsButton = display.newImage("User-Profile.png")
   panicSettingsButton:scale(0.12, 0.12)
   panicSettingsButton.y = display.contentHeight + 10
   panicSettingsButton.x = 7.75*display.contentWidth/10
-  panicSettingsButton.isVisible = false
   
   -- login feature which is enabled by default --
 
@@ -169,7 +179,9 @@ countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeig
 menuBarButtons = {
     addButton( 1, display.contentWidth/2, display.contentHeight + 10, display.contentWidth/3, display.contentHeight/12, false, 'Panic Button'), 
     addButton( 2, homeButton.x, homeButton.y, homeButton.width*0.22, homeButton.height*0.22, true, homeButton ),
-    addButton( 3, panicSettingsButton.x, panicSettingsButton.y, panicSettingsButton.width*0.12, panicSettingsButton.height*0.12, true, panicSettingsButton )
+    addButton( 3, panicSettingsButton.x, panicSettingsButton.y, panicSettingsButton.width*0.12, panicSettingsButton.height*0.12, true, panicSettingsButton ),
+    homeButton,
+    panicSettingsButton
   }
   
 mainMenuButtons = {
