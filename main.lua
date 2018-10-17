@@ -87,6 +87,11 @@ local function handleInput( event )
     hideButtons(mainMenuButtons)
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
+  elseif id == 7 then
+    hideButtons(phraseButtons)
+    --showButtons(countrySelectButton)
+    usefulPhraseButtons() -- to be done
+    showButtons(menuBarButtons)
   elseif id == 10 then
     if loginAccepted() then
       hideButtons(loginButtons)
@@ -342,6 +347,38 @@ localLawyerButtons = {
   lawyerScroll,
   lawyerSearch
 }
+
+function usefulPhraseButtons()
+  
+  countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, false, false, 'Current Country: Australia')
+
+  -- background for text
+  local myRectangle = display.newRect(display.contentCenterX, 90, display.contentWidth, 50)
+  myRectangle.strokeWidth = 3
+  myRectangle:setFillColor(0, 0.8, 0.8, 1 )
+  myRectangle:setStrokeColor(0, 0.8, 0.8, 1 )
+
+  local options = 
+  {
+      text = "Useful phrases",     
+      x = display.contentWidth / 2,
+      y = 90,
+      width = display.contentWidth / 2,
+      font = "Roboto-Medium.ttf",   
+      fontSize = 20,
+      align = "center"
+  }
+
+  local usefulPhraseText = display.newText(options)
+  usefulPhraseText:setFillColor( 1, 1, 1 )
+end
+
+function applyBackground()
+  local background = display.newImage("Background.jpg")
+  background.anchorX = 0
+  background.anchorY = 0
+  background:scale(0.45, 0.72)
+end
   
 function showButtons(buttons)
     for _, button in pairs(buttons) do
