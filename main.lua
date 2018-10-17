@@ -73,9 +73,15 @@ local buttonStrokeFillColor = { default={0,0.8,0.8}, over={0.8,0.8,1,1} }
 -- handle button press
 local function handleInput( event )
   id = event.target.id
+  print("button push " .. id)
   if id == 2 then
     hideButtons(currentButtons)
     showButtons(mainMenuButtons)
+    showButtons(menuBarButtons)
+  elseif id == 4 then
+    hideButtons(currentButtons)
+    populateLawyerList()
+    showButtons(localLawyerButtons)
     showButtons(menuBarButtons)
   elseif id == 5 then
     hideButtons(mainMenuButtons)
@@ -87,6 +93,34 @@ local function handleInput( event )
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
     end
+  end
+end
+
+-- handle scrolling
+local function scrollListener( event )
+  local phase = event.phase
+    if ( phase == "began" ) then print( "Scroll view was touched" )
+    elseif ( phase == "moved" ) then print( "Scroll view was moved" )
+    elseif ( phase == "ended" ) then print( "Scroll view was released" )
+    end
+ 
+    -- In the event a scroll limit is reached...
+    if ( event.limitReached ) then
+        if ( event.direction == "up" ) then print( "Reached bottom limit" )
+        elseif ( event.direction == "down" ) then print( "Reached top limit" )
+        end
+    end
+ 
+    return true
+end
+
+-- handle searching
+local function searchListener( event )
+  if ( event.phase == "ended" or event.phase == "submitted" ) then
+    lawyerScroll:removeSelf()
+    lawyerScroll = getLawyerScroll()
+    table.insert(currentButtons, lawyerScroll)
+    populateLawyerList(lawyerSearch.text)
   end
 end
 
@@ -208,6 +242,66 @@ txtPassword.inputType = "default"
 txtPassword.placeholder = "-- insert password --"
 --set font
 txtPassword.font = native.newFont(native.systemFont, 12)
+
+-- scroll pane for local lawyer list
+
+function getLawyerScroll()
+  scroll = widget.newScrollView(
+  {
+      id = "lawyer",
+      top = 100,
+      left = 0,
+      width = display.contentWidth,
+      height = 350,
+      scrollWidth = display.contentWidth,
+      scrollHeight = 1600,
+      hideBackground = true,
+      horizontalScrollDisabled = true,
+      listener = scrollListener
+    }
+  )
+  return scroll
+end
+
+lawyerScroll = getLawyerScroll()
+lawyerSearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
+lawyerSearch.placeholder = "Search Lawyers"
+lawyerSearch.id = "lawyer"
+lawyerSearch:addEventListener("userInput", searchListener)
+
+function addButtonToScroll(scroll, row, num)
+  button = widget.newButton(
+    {
+      id = scroll.id .. row.id,
+      label = row.name,
+      shape = "roundedRect",
+      cornerRadius = 0,
+      fillColor = buttonFillColor,
+      strokeColor = buttonStrokeFillColor,
+      strokeWidth = 0,
+      height = display.contentHeight/9,
+      width = 300,
+      x = display.contentWidth/2,
+      y = (num * 75) + 30,
+      onRelease = handleInput
+    }
+  )
+  scroll:insert(button)
+end
+
+function populateLawyerList( search )
+  if search == nil then
+    query = [[SELECT * FROM lawyer]]
+  else
+    query = [[SELECT * FROM lawyer WHERE UPPER(name) LIKE "%]] .. search:upper() .. [[%"]]
+    print("Searched on " .. search .. " query " .. query)
+  end
+  i = 0
+  for row in db:nrows(query) do
+    addButtonToScroll(lawyerScroll, row, i)
+    i = i + 1
+  end
+end
   
 currentButtons = {}
 
@@ -223,9 +317,15 @@ menuBarButtons = {
   
 mainMenuButtons = {
     countrySelectButton,
+<<<<<<< HEAD
 		addButton( 4, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Local Lawyers'),
 		addButton( 5, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Phrase Translation'), 
 		addButton( 6, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Useful Contacts'), 
+=======
+		addButton( 4, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Local Lawyers'),
+		addButton( 5, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Phrase Translation'), 
+		addButton( 6, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Useful Contacts')
+>>>>>>> 5e3a5d2d7575ce032121831a0d4c181169673d43
   }
   
 phraseButtons = {
@@ -243,6 +343,11 @@ loginButtons = {
     labelPassword,
     labelUsername
 }
+
+localLawyerButtons = {
+  lawyerScroll,
+  lawyerSearch
+}
   
 function showButtons(buttons)
     for _, button in pairs(buttons) do
@@ -258,7 +363,9 @@ function hideButtons(buttons)
     currentButtons = {}
 end
 
+populateLawyerList()
 hideButtons(phraseButtons)
 hideButtons(menuBarButtons)
-hideButtons(mainMenuButtons)
-showButtons(loginButtons)
+hideButtons(localLawyerButtons)
+hideButtons(loginButtons)
+showButtons(mainMenuButtons)
