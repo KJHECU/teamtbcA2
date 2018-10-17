@@ -9,7 +9,7 @@
 local background = display.newImage("Background.jpg")
 background.anchorX = 0
 background.anchorY = 0
-background:scale(0.45, 0.58)
+background:scale(0.45, 0.72)
 
 local widget = require( "widget" )
 local sqlite3 = require( "sqlite3" )
@@ -317,15 +317,9 @@ menuBarButtons = {
   
 mainMenuButtons = {
     countrySelectButton,
-<<<<<<< HEAD
 		addButton( 4, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Local Lawyers'),
 		addButton( 5, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Phrase Translation'), 
 		addButton( 6, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Useful Contacts'), 
-=======
-		addButton( 4, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Local Lawyers'),
-		addButton( 5, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Phrase Translation'), 
-		addButton( 6, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/10, false, 'Useful Contacts')
->>>>>>> 5e3a5d2d7575ce032121831a0d4c181169673d43
   }
   
 phraseButtons = {
@@ -365,7 +359,7 @@ end
 
 populateLawyerList()
 hideButtons(phraseButtons)
-hideButtons(menuBarButtons)
+showButtons(menuBarButtons)
 hideButtons(localLawyerButtons)
 hideButtons(loginButtons)
 showButtons(mainMenuButtons)
