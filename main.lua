@@ -92,8 +92,11 @@ local function handleInput( event )
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
-    end
-  end
+	 end
+  elseif id == 11 then
+	  hideButtons(loginButtons)
+	  showButtons(registrationButtons)
+	 end
 end
 
 -- handle scrolling
@@ -210,38 +213,126 @@ panicSettingsButton = display.newImage("User-Profile.png")
 
 -- username capture
 
-txtUsername = native.newTextField(0,0,200,30)
-labelUsername = display.newText( "Username", 265, 85, 0, 0, native.systemFont, 18 )
-labelUsername:setFillColor ( black )
-txtUsername.anchorX = 0
-txtUsername.anchorY = 0
-txtUsername.x = 10
-txtUsername.y = 70
-txtUsername:setTextColor(0,0,0)
+backloadEmail = display.newRect(display.contentWidth/2, display.contentHeight/6.65, display.contentWidth, display.contentHeight/15)
+backloadEmail:setFillColor (0, 0.8, 0.8)
+inputloadEmail = native.newTextField(0,0,200,30)
+txtloadEmail = display.newText( "Email",display.contentWidth/0.8, display.contentHeight/6.15, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputloadEmail.x = display.contentWidth/2.9
+inputloadEmail.y = display.contentHeight/6.6
+inputloadEmail:setTextColor(0,0,0)
 --set input type
-txtUsername.inputType = "default"
+inputloadEmail.inputType = "default"
 --define the placeholder
-txtUsername.placeholder = "-- insert username --"
+inputloadEmail.placeholder = "-- insert email--"
 --set font
-txtUsername.font = native.newFont(native.systemFont, 12)
-native.setKeyboardFocus(txtUsername)
+inputloadEmail.font = native.newFont(native.systemFont, 12)
+native.setKeyboardFocus(inputloadEmail)
 
 -- password capture
-txtPassword = native.newTextField(0,0,200,30)
-labelPassword = display.newText( "Password", 265, 135, 0, 0, native.systemFont, 18 )
-labelPassword:setFillColor ( black )
-txtPassword.anchorX = 0
-txtPassword.anchorY = 0
-txtPassword.x = 10
-txtPassword.y = 120
-txtPassword:setTextColor(0,0,0)
-txtPassword.isSecure = true
+backloadPassword = display.newRect(display.contentWidth/2, display.contentHeight/4.2, display.contentWidth, display.contentHeight/15)
+backloadPassword:setFillColor (0, 0.8, 0.8)
+inputloadPassword = native.newTextField(0,0,200,30)
+txtloadPassword = display.newText( "Password", display.contentWidth/0.83, display.contentHeight/4, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputloadPassword.x = display.contentWidth/2.9
+inputloadPassword.y = display.contentHeight/4.2
+inputloadPassword:setTextColor(0,0,0) 
 --set input type
-txtPassword.inputType = "default"
+inputloadPassword.inputType = "default"
 --define the placeholder
-txtPassword.placeholder = "-- insert password --"
+inputloadPassword.placeholder = "-- insert password --"
 --set font
-txtPassword.font = native.newFont(native.systemFont, 12)
+inputloadPassword.font = native.newFont(native.systemFont, 12)
+
+------- registration fields
+-- registration label
+backRegistration = display.newRect(display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15)
+backRegistration:setFillColor (0, 0.8, 0.8)
+txtRegistration = display.newText("Registration", display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, native.systemFont, 18)
+txtRegistration:setFillColor (1,1,1 )
+txtRegistration.x = display.contentWidth/1.20
+txtRegistration.y = display.contentHeight/13
+
+-- email field
+backregEmail = display.newRect(display.contentWidth/2, display.contentHeight/6.7, display.contentWidth, display.contentHeight/15)
+backregEmail:setFillColor (0, 0.8, 0.8)
+inputregEmail = native.newTextField(0,0,200,30)
+txtregEmail = display.newText( "Email",display.contentWidth/0.8, display.contentHeight/6.2, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputregEmail.x = display.contentWidth/2.9
+inputregEmail.y = display.contentHeight/6.6
+inputregEmail:setTextColor(0,0,0)
+--set input type
+inputregEmail.inputType = "default"
+--define the placeholder
+inputregEmail.placeholder = "-- insert email--"
+--set font
+inputregEmail.font = native.newFont(native.systemFont, 12)
+native.setKeyboardFocus(inputEmail)
+
+-- First Name
+backFname = display.newRect(display.contentWidth/2, display.contentHeight/4.2, display.contentWidth, display.contentHeight/15)
+backFname:setFillColor (0, 0.8, 0.8)
+inputFname = native.newTextField(0,0,200,30)
+txtFname = display.newText( "First Name", display.contentWidth/0.85, display.contentHeight/4, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputFname.x = display.contentWidth/2.9
+inputFname.y = display.contentHeight/4.2
+inputFname:setTextColor(0,0,0) 
+--set input type
+inputFname.inputType = "default"
+--define the placeholder
+inputFname.placeholder = "-- insert first name --"
+--set font
+inputFname.font = native.newFont(native.systemFont, 12)
+
+-- Surname
+backSname = display.newRect(display.contentWidth/2, display.contentHeight/3.1, display.contentWidth, display.contentHeight/15)
+backSname:setFillColor (0, 0.8, 0.8)
+inputSname = native.newTextField(0,0,200,30)
+txtSname = display.newText( "Surname", display.contentWidth/0.83, display.contentHeight/3, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputSname.x = display.contentWidth/2.9
+inputSname.y = display.contentHeight/3.1
+inputSname:setTextColor(0,0,0) 
+--set input type
+inputSname.inputType = "default"
+--define the placeholder
+inputSname.placeholder = "-- insert first name --"
+--set font
+inputSname.font = native.newFont(native.systemFont, 12)
+
+-- Mobile No
+backMobile = display.newRect(display.contentWidth/2, display.contentHeight/2.5, display.contentWidth, display.contentHeight/15)
+backMobile:setFillColor (0, 0.8, 0.8)
+inputMobile = native.newTextField(0,0,200,30)
+txtMobile = display.newText( "Mobile no", display.contentWidth/0.84, display.contentHeight/2.425, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputMobile.x = display.contentWidth/2.9
+inputMobile.y = display.contentHeight/2.5
+inputMobile:setTextColor(0,0,0) 
+--set input type
+inputMobile.inputType = "default"
+--define the placeholder
+inputMobile.placeholder = "-- insert first name --"
+--set font
+inputMobile.font = native.newFont(native.systemFont, 12)
+
+-- Password
+backregPassword = display.newRect(display.contentWidth/2, display.contentHeight/2.1, display.contentWidth, display.contentHeight/15)
+backregPassword:setFillColor (0, 0.8, 0.8)
+inputregPassword = native.newTextField(0,0,200,30)
+txtregPassword = display.newText( "Password", display.contentWidth/0.84, display.contentHeight/2.05, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputregPassword.x = display.contentWidth/2.9
+inputregPassword.y = display.contentHeight/2.1
+inputregPassword:setTextColor(0,0,0) 
+--set input type
+inputregPassword.inputType = "default"
+--define the placeholder
+inputregPassword.placeholder = "-- insert password --"
+--set font
+inputregPassword.font = native.newFont(native.systemFont, 12)
+
+
+-- Next of Kin label
+backKin = display.newRect(display.contentWidth/2, display.contentHeight/1.8, display.contentWidth/2, display.contentHeight/15)
+backKin:setFillColor (0, 0.8, 0.8)
+txtKin = display.newText( "Next of Kin info", display.contentWidth/1.25, display.contentHeight/1.775, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
 
 -- scroll pane for local lawyer list
 
@@ -332,10 +423,37 @@ phraseButtons = {
 loginButtons = {
 		addButton( 10, display.contentWidth/2, 6*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Login'),
 		addButton( 11, display.contentWidth/2, 7*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false,  'Register'),
-    txtPassword,
-    txtUsername,
-    labelPassword,
-    labelUsername
+    backloadEmail,
+	txtloadEmail,
+	inputloadEmail,
+	backloadPassword,
+	txtloadPassword,
+	inputloadPassword,
+
+}
+
+registrationButtons = {
+	backRegistration,
+	txtRegistration,
+	backregEmail,
+	inputregEmail,
+	txtregEmail,
+	backFname,
+	inputFname,
+	txtFname,
+	backSname,
+	inputSname,
+	txtSname,
+	backMobile,
+	inputMobile,
+	txtMobile,
+	backregPassword,
+	inputregPassword,
+	txtregPassword,
+	backKin,
+	txtKin
+
+	
 }
 
 localLawyerButtons = {
@@ -359,7 +477,8 @@ end
 
 populateLawyerList()
 hideButtons(phraseButtons)
-showButtons(menuBarButtons)
+hideButtons(menuBarButtons)
 hideButtons(localLawyerButtons)
-hideButtons(loginButtons)
-showButtons(mainMenuButtons)
+showButtons(loginButtons)
+hideButtons(mainMenuButtons)
+hideButtons(registrationButtons)
