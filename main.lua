@@ -475,7 +475,6 @@ localLawyerButtons = {
   lawyerSearch
 }
 
-<<<<<<< HEAD
 function usefulPhraseButtons()
   
   countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, false, false, 'Current Country: Australia')
@@ -501,18 +500,10 @@ function usefulPhraseButtons()
   usefulPhraseText:setFillColor( 1, 1, 1 )
 end
 
-function applyBackground()
-  local background = display.newImage("Background.jpg")
-  background.anchorX = 0
-  background.anchorY = 0
-  background:scale(0.45, 0.72)
-end
-=======
 countryButtons = {
   countryScroll,
   countrySearch
 }
->>>>>>> master
   
 function showButtons(buttons)
     for _, button in pairs(buttons) do
