@@ -16,6 +16,11 @@ local sqlite3 = require( "sqlite3" )
 local path = system.pathForFile( "data.db", system.ResourceDirectory )
 local db = sqlite3.open( path )  
 
+local currentCountryId = 1
+
+-- List for placing currently active buttons for easier hiding
+currentButtons = {}
+
 -- Handle the "applicationExit" event to close the database
 local function onSystemEvent( event )
     if ( event.type == "applicationExit" ) then             
@@ -80,7 +85,8 @@ local function handleInput( event )
     showButtons(menuBarButtons)
   elseif id == 4 then
     hideButtons(currentButtons)
-    populateLawyerList()
+    populateScroll(lawyerScroll, nil)
+    lawyerScroll.isVisible = true
     showButtons(localLawyerButtons)
     showButtons(menuBarButtons)
   elseif id == 5 then
@@ -97,104 +103,100 @@ local function handleInput( event )
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
+	 end
+  elseif id == 11 then
+	  hideButtons(loginButtons)
+	  showButtons(registrationButtons)
+  elseif id == 99 then
+    hideButtons(currentButtons)
+    populateScroll(countryScroll, nil)
+    countryScroll.isVisible = true
+    showButtons(countryButtons)
+    showButtons(menuBarButtons)
+  elseif string.starts(id,"country") then
+    currentCountryId = id:sub(8)
+    for row in db:nrows([[SELECT name FROM country WHERE id=]] .. currentCountryId) do
+      countrySelectButton:setLabel("Current Country: " .. row.name)
     end
+    hideButtons(currentButtons)
+    showButtons(mainMenuButtons)
+    showButtons(menuBarButtons)
   end
 end
 
--- handle scrolling
-local function scrollListener( event )
-  local phase = event.phase
-    if ( phase == "began" ) then print( "Scroll view was touched" )
-    elseif ( phase == "moved" ) then print( "Scroll view was moved" )
-    elseif ( phase == "ended" ) then print( "Scroll view was released" )
-    end
- 
-    -- In the event a scroll limit is reached...
-    if ( event.limitReached ) then
-        if ( event.direction == "up" ) then print( "Reached bottom limit" )
-        elseif ( event.direction == "down" ) then print( "Reached top limit" )
-        end
-    end
- 
-    return true
-end
-
--- handle searching
-local function searchListener( event )
+-- handle searching for lawyer
+local function searchListenerLaw( event )
   if ( event.phase == "ended" or event.phase == "submitted" ) then
     lawyerScroll:removeSelf()
-    lawyerScroll = getLawyerScroll()
+    lawyerScroll = getScroll("lawyer")
     table.insert(currentButtons, lawyerScroll)
-    populateLawyerList(lawyerSearch.text)
+    populateScroll(lawyerScroll, lawyerSearch.text)
+  end
+end
+
+-- handle searching for country
+local function searchListenerCountry( event )
+  if ( event.phase == "ended" or event.phase == "submitted" ) then
+    countryScroll:removeSelf()
+    countryScroll = getScroll("country")
+    table.insert(currentButtons, countryScroll)
+    populateScroll(countryScroll, countrySearch.text)
   end
 end
 
 function loginAccepted()
-  query = [[SELECT * FROM user WHERE username="]] .. txtUsername.text .. [["]]
+  query = [[SELECT * FROM user WHERE email="]] .. inputLoadEmail.text .. [["]]
   for row in db:nrows(query) do
-    return row.password == txtPassword.text
+    return row.password == inputLoadPassword.text
   end
 end
 
 -- utility to make buttons
-local function addButton( ID, x, y, width, height, isIcon, isPanic, label )
-  if isIcon then
+local function addButton( ID, x, y, width, height, btnType, label )
+  if btnType == "icon" then
     button = widget.newButton(
         {
-          id = ID,
           default = label,
           onRelease = handleInput,
-          emboss = false,
           width = width,
-          height = height,
-          x = x,
-          y = y
+          height = height
         }
       ) 
 	  
-  elseif isPanic then
+  elseif btnType == "panic" then
     button = widget.newButton(
         {
-          id = ID,
           label = label,
           shape = "roundedRect",
           cornerRadius = 8,
           fillColor = { default = { 255, 0, 0,}, over = { 255, 0, 0.5,} },
           strokeColor = { default = { 255, 0, 0 }, over = { 255, 0, 0} },
-		  labelColor = { default = { 255, 255, 0 }, over = { 255, 255, 0} },
+          labelColor = { default = { 255, 255, 0 }, over = { 255, 255, 0} },
           strokeWidth = 1,
           onRelease = handleInput,
-          emboss = false,
-          width = 130,
-          height = 38,
-          x = x,
-          y = y
-        		
-		}
-	
-        )  
+          width = width,
+          height = height
+        }
+      )  
   else
     button = widget.newButton(
         {
-          id = ID,
           label = label,
           shape = "roundedRect",
           cornerRadius = 10,
           fillColor = buttonFillColor,
           strokeColor = buttonStrokeFillColor,
-		  labelColor = { default = { 163, 25, 12 }, over = { 163, 25, 12} },
+          labelColor = { default = { 163, 25, 12 }, over = { 163, 25, 12} },
           strokeWidth = 2,
           onRelease = handleInput,
-          emboss = false,
           width = width,
-          height = height,
-          x = x,
-          y = y
-        		
-		}
-	
-        )    
+          height = height
+        }
+      )    
   end
+  button.id = ID
+  button.x = x
+  button.y = y
 	return button
 end
 
@@ -211,49 +213,138 @@ panicSettingsButton = display.newImage("User-Profile.png")
 
 
   
-  -- login feature which is enabled by default --
+-- login feature which is enabled by default --
 
 -- username capture
 
-txtUsername = native.newTextField(0,0,200,30)
-labelUsername = display.newText( "Username", 265, 85, 0, 0, native.systemFont, 18 )
-labelUsername:setFillColor ( black )
-txtUsername.anchorX = 0
-txtUsername.anchorY = 0
-txtUsername.x = 10
-txtUsername.y = 70
-txtUsername:setTextColor(0,0,0)
+backLoadEmail = display.newRect(display.contentWidth/2, display.contentHeight/6.65, display.contentWidth, display.contentHeight/15)
+backLoadEmail:setFillColor (0, 0.8, 0.8)
+inputLoadEmail = native.newTextField(0,0,200,30)
+txtLoadEmail = display.newText( "Email",display.contentWidth/0.8, display.contentHeight/6.15, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputLoadEmail.x = display.contentWidth/2.9
+inputLoadEmail.y = display.contentHeight/6.6
+inputLoadEmail:setTextColor(0,0,0)
 --set input type
-txtUsername.inputType = "default"
+inputLoadEmail.inputType = "default"
 --define the placeholder
-txtUsername.placeholder = "-- insert username --"
+inputLoadEmail.placeholder = "-- insert email--"
 --set font
-txtUsername.font = native.newFont(native.systemFont, 12)
-native.setKeyboardFocus(txtUsername)
+inputLoadEmail.font = native.newFont(native.systemFont, 12)
+native.setKeyboardFocus(inputLoadEmail)
 
 -- password capture
-txtPassword = native.newTextField(0,0,200,30)
-labelPassword = display.newText( "Password", 265, 135, 0, 0, native.systemFont, 18 )
-labelPassword:setFillColor ( black )
-txtPassword.anchorX = 0
-txtPassword.anchorY = 0
-txtPassword.x = 10
-txtPassword.y = 120
-txtPassword:setTextColor(0,0,0)
-txtPassword.isSecure = true
+backLoadPassword = display.newRect(display.contentWidth/2, display.contentHeight/4.2, display.contentWidth, display.contentHeight/15)
+backLoadPassword:setFillColor (0, 0.8, 0.8)
+inputLoadPassword = native.newTextField(0,0,200,30)
+txtLoadPassword = display.newText( "Password", display.contentWidth/0.83, display.contentHeight/4, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputLoadPassword.x = display.contentWidth/2.9
+inputLoadPassword.y = display.contentHeight/4.2
+inputLoadPassword:setTextColor(0,0,0) 
 --set input type
-txtPassword.inputType = "default"
+inputLoadPassword.inputType = "default"
+inputLoadPassword.isSecure = true
 --define the placeholder
-txtPassword.placeholder = "-- insert password --"
+inputLoadPassword.placeholder = "-- insert password --"
 --set font
-txtPassword.font = native.newFont(native.systemFont, 12)
+inputLoadPassword.font = native.newFont(native.systemFont, 12)
 
--- scroll pane for local lawyer list
+------- registration fields
+-- registration label
+backRegistration = display.newRect(display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15)
+backRegistration:setFillColor (0, 0.8, 0.8)
+txtRegistration = display.newText("Registration", display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, native.systemFont, 18)
+txtRegistration:setFillColor (1,1,1 )
+txtRegistration.x = display.contentWidth/1.20
+txtRegistration.y = display.contentHeight/13
 
-function getLawyerScroll()
+-- email field
+backRegEmail = display.newRect(display.contentWidth/2, display.contentHeight/6.7, display.contentWidth, display.contentHeight/15)
+backRegEmail:setFillColor (0, 0.8, 0.8)
+inputRegEmail = native.newTextField(0,0,200,30)
+txtRegEmail = display.newText( "Email",display.contentWidth/0.8, display.contentHeight/6.2, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputRegEmail.x = display.contentWidth/2.9
+inputRegEmail.y = display.contentHeight/6.6
+inputRegEmail:setTextColor(0,0,0)
+--set input type
+inputRegEmail.inputType = "default"
+--define the placeholder
+inputRegEmail.placeholder = "-- insert email--"
+--set font
+inputRegEmail.font = native.newFont(native.systemFont, 12)
+native.setKeyboardFocus(inputEmail)
+
+-- First Name
+backFname = display.newRect(display.contentWidth/2, display.contentHeight/4.2, display.contentWidth, display.contentHeight/15)
+backFname:setFillColor (0, 0.8, 0.8)
+inputFname = native.newTextField(0,0,200,30)
+txtFname = display.newText( "First Name", display.contentWidth/0.85, display.contentHeight/4, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputFname.x = display.contentWidth/2.9
+inputFname.y = display.contentHeight/4.2
+inputFname:setTextColor(0,0,0) 
+--set input type
+inputFname.inputType = "default"
+--define the placeholder
+inputFname.placeholder = "-- insert first name --"
+--set font
+inputFname.font = native.newFont(native.systemFont, 12)
+
+-- Surname
+backSname = display.newRect(display.contentWidth/2, display.contentHeight/3.1, display.contentWidth, display.contentHeight/15)
+backSname:setFillColor (0, 0.8, 0.8)
+inputSname = native.newTextField(0,0,200,30)
+txtSname = display.newText( "Surname", display.contentWidth/0.83, display.contentHeight/3, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputSname.x = display.contentWidth/2.9
+inputSname.y = display.contentHeight/3.1
+inputSname:setTextColor(0,0,0) 
+--set input type
+inputSname.inputType = "default"
+--define the placeholder
+inputSname.placeholder = "-- insert first name --"
+--set font
+inputSname.font = native.newFont(native.systemFont, 12)
+
+-- Mobile No
+backMobile = display.newRect(display.contentWidth/2, display.contentHeight/2.5, display.contentWidth, display.contentHeight/15)
+backMobile:setFillColor (0, 0.8, 0.8)
+inputMobile = native.newTextField(0,0,200,30)
+txtMobile = display.newText( "Mobile no", display.contentWidth/0.84, display.contentHeight/2.425, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputMobile.x = display.contentWidth/2.9
+inputMobile.y = display.contentHeight/2.5
+inputMobile:setTextColor(0,0,0) 
+--set input type
+inputMobile.inputType = "default"
+--define the placeholder
+inputMobile.placeholder = "-- insert first name --"
+--set font
+inputMobile.font = native.newFont(native.systemFont, 12)
+
+-- Password
+backRegPassword = display.newRect(display.contentWidth/2, display.contentHeight/2.1, display.contentWidth, display.contentHeight/15)
+backRegPassword:setFillColor (0, 0.8, 0.8)
+inputRegPassword = native.newTextField(0,0,200,30)
+txtRegPassword = display.newText( "Password", display.contentWidth/0.84, display.contentHeight/2.05, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+inputRegPassword.x = display.contentWidth/2.9
+inputRegPassword.y = display.contentHeight/2.1
+inputRegPassword:setTextColor(0,0,0) 
+--set input type
+inputRegPassword.inputType = "default"
+--define the placeholder
+inputRegPassword.placeholder = "-- insert password --"
+--set font
+inputRegPassword.font = native.newFont(native.systemFont, 12)
+
+
+-- Next of Kin label
+backKin = display.newRect(display.contentWidth/2, display.contentHeight/1.8, display.contentWidth/2, display.contentHeight/15)
+backKin:setFillColor (0, 0.8, 0.8)
+txtKin = display.newText( "Next of Kin info", display.contentWidth/1.25, display.contentHeight/1.775, display.contentWidth, display.contentHeight/15, native.systemFont, 18 )
+
+-- scroll pane for local lawyer & country lists
+
+function getScroll( scrollType )
   scroll = widget.newScrollView(
   {
-      id = "lawyer",
+      id = scrollType,
       top = 100,
       left = 0,
       width = display.contentWidth,
@@ -261,18 +352,24 @@ function getLawyerScroll()
       scrollWidth = display.contentWidth,
       scrollHeight = 1600,
       hideBackground = true,
-      horizontalScrollDisabled = true,
-      listener = scrollListener
+      horizontalScrollDisabled = true
     }
   )
+  table.insert(currentButtons, scroll)
   return scroll
 end
 
-lawyerScroll = getLawyerScroll()
+lawyerScroll = getScroll( "lawyer" )
 lawyerSearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
-lawyerSearch.placeholder = "Search Lawyers"
-lawyerSearch.id = "lawyer"
-lawyerSearch:addEventListener("userInput", searchListener)
+lawyerSearch.placeholder = "Search Lawyer"
+lawyerSearch.id = "lawyerId"
+lawyerSearch:addEventListener("userInput", searchListenerLaw)
+
+countryScroll = getScroll( "country" )
+countrySearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
+countrySearch.placeholder = "Search Country"
+countrySearch.id = "countryId"
+countrySearch:addEventListener("userInput", searchListenerCountry)
 
 function addButtonToScroll(scroll, row, num)
   button = widget.newButton(
@@ -281,8 +378,7 @@ function addButtonToScroll(scroll, row, num)
       label = row.name,
       shape = "roundedRect",
       cornerRadius = 0,
-      fillColor = buttonFillColor,
-      strokeColor = buttonStrokeFillColor,
+      fillColor = white,
       strokeWidth = 0,
       height = display.contentHeight/9,
       width = 300,
@@ -292,55 +388,86 @@ function addButtonToScroll(scroll, row, num)
     }
   )
   scroll:insert(button)
+  table.insert(currentButtons, button)
 end
 
-function populateLawyerList( search )
-  if search == nil then
-    query = [[SELECT * FROM lawyer]]
+function populateScroll( scroll, search )
+  if scroll == lawyerScroll then
+    if search == nil then
+      query = [[SELECT * FROM lawyer WHERE countryid=]] .. currentCountryId
+    else
+      query = [[SELECT * FROM lawyer WHERE UPPER(name) LIKE "%]] .. search:upper() .. [[%" AND countryid=]] .. currentCountryId
+    end
   else
-    query = [[SELECT * FROM lawyer WHERE UPPER(name) LIKE "%]] .. search:upper() .. [[%"]]
-    print("Searched on " .. search .. " query " .. query)
+    if search == nil then
+      query = [[SELECT * FROM country]]
+    else
+      query = [[SELECT * FROM country WHERE UPPER(name) LIKE "%]] .. search:upper() .. [[%"]]
+    end
   end
+  query = query .. [[ ORDER BY name ASC]]
   i = 0
   for row in db:nrows(query) do
-    addButtonToScroll(lawyerScroll, row, i)
+    addButtonToScroll(scroll, row, i)
     i = i + 1
   end
 end
-  
-currentButtons = {}
 
-countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, false, false, 'Current Country: Australia')
+countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, "", 'Current Country: Australia')
 
 menuBarButtons = {
-    addButton( 1, display.contentWidth/2, display.contentHeight + 10, display.contentWidth/3, display.contentHeight/12, false, true, 'Panic Button'), 
-    addButton( 2, homeButton.x, homeButton.y, homeButton.width*0.22, homeButton.height*0.22, true, false, homeButton ),
-    addButton( 3, panicSettingsButton.x, panicSettingsButton.y, panicSettingsButton.width*0.12, panicSettingsButton.height*0.12, true, false, panicSettingsButton ),
+    addButton( 1, display.contentWidth/2, display.contentHeight + 10, 130, 38, "panic", 'Panic Button'), 
+    addButton( 2, homeButton.x, homeButton.y, homeButton.width*0.22, homeButton.height*0.22, "icon", homeButton ),
+    addButton( 3, panicSettingsButton.x, panicSettingsButton.y, panicSettingsButton.width*0.12, panicSettingsButton.height*0.12, "icon", panicSettingsButton ),
     homeButton,
     panicSettingsButton
   }
   
 mainMenuButtons = {
     countrySelectButton,
-		addButton( 4, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Local Lawyers'),
-		addButton( 5, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Phrase Translation'), 
-		addButton( 6, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Useful Contacts'), 
+		addButton( 4, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Local Lawyers'),
+		addButton( 5, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Phrase Translation'), 
+		addButton( 6, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Useful Contacts'), 
   }
   
 phraseButtons = {
     countrySelectButton,
-		addButton( 7, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Useful Phrases'),
-		addButton( 8, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Legal Phrases'), 
-		addButton( 9, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Set Favourite Phrases'), 
+		addButton( 7, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Useful Phrases'),
+		addButton( 8, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Legal Phrases'), 
+		addButton( 9, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Set Favourite Phrases'), 
   }
   
 loginButtons = {
-		addButton( 10, display.contentWidth/2, 6*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false, 'Login'),
-		addButton( 11, display.contentWidth/2, 7*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, false, false,  'Register'),
-    txtPassword,
-    txtUsername,
-    labelPassword,
-    labelUsername
+		addButton( 10, display.contentWidth/2, 6*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Login'),
+		addButton( 11, display.contentWidth/2, 7*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "",  'Register'),
+    backLoadEmail,
+    txtLoadEmail,
+    inputLoadEmail,
+    backLoadPassword,
+    txtLoadPassword,
+    inputLoadPassword,
+  }
+
+registrationButtons = {
+	backRegistration,
+	txtRegistration,
+	backRegEmail,
+	inputRegEmail,
+	txtRegEmail,
+	backFname,
+	inputFname,
+	txtFname,
+	backSname,
+	inputSname,
+	txtSname,
+	backMobile,
+	inputMobile,
+	txtMobile,
+	backRegPassword,
+	inputRegPassword,
+	txtRegPassword,
+	backKin,
+	txtKin
 }
 
 localLawyerButtons = {
@@ -348,6 +475,7 @@ localLawyerButtons = {
   lawyerSearch
 }
 
+<<<<<<< HEAD
 function usefulPhraseButtons()
   
   countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, false, false, 'Current Country: Australia')
@@ -379,6 +507,12 @@ function applyBackground()
   background.anchorY = 0
   background:scale(0.45, 0.72)
 end
+=======
+countryButtons = {
+  countryScroll,
+  countrySearch
+}
+>>>>>>> master
   
 function showButtons(buttons)
     for _, button in pairs(buttons) do
@@ -394,9 +528,10 @@ function hideButtons(buttons)
     currentButtons = {}
 end
 
-populateLawyerList()
+hideButtons(countryButtons)
 hideButtons(phraseButtons)
-showButtons(menuBarButtons)
+hideButtons(menuBarButtons)
 hideButtons(localLawyerButtons)
-hideButtons(loginButtons)
-showButtons(mainMenuButtons)
+showButtons(loginButtons)
+hideButtons(mainMenuButtons)
+hideButtons(registrationButtons)
