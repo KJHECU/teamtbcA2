@@ -81,6 +81,7 @@ local function handleInput( event )
   print("button push " .. id)
   if id == 2 then
     hideButtons(currentButtons)
+    hideUsefulPhraseButtons()
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   elseif id == 4 then
@@ -95,8 +96,7 @@ local function handleInput( event )
     showButtons(menuBarButtons)
   elseif id == 7 then
     hideButtons(phraseButtons)
-    --showButtons(countrySelectButton)
-    usefulPhraseButtons() -- to be done
+    usefulPhraseButtons()
     showButtons(menuBarButtons)
   elseif id == 10 then
     if loginAccepted() then
@@ -553,15 +553,22 @@ localLawyerButtons = {
   lawyerSearch
 }
 
+-- useful phrase section
 function usefulPhraseButtons()
   
-  countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, false, false, 'Current Country: Australia')
+  countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, "", 'Current Country: Australia')
 
-  -- background for text
-  local myRectangle = display.newRect(display.contentCenterX, 90, display.contentWidth, 50)
+  -- background for useful phrase text
+  myRectangle = display.newRect(display.contentCenterX, 90, display.contentWidth, 50)
   myRectangle.strokeWidth = 3
   myRectangle:setFillColor(0, 0.8, 0.8, 1 )
   myRectangle:setStrokeColor(0, 0.8, 0.8, 1 )
+
+  -- background for text area
+  textAreaRectangle = display.newRect(display.contentCenterX, 280, display.contentWidth, 330)
+  textAreaRectangle.strokeWidth = 3
+  textAreaRectangle:setFillColor(1, 1, 1)
+  textAreaRectangle:setStrokeColor(1, 1, 1)
 
   local options = 
   {
@@ -574,8 +581,60 @@ function usefulPhraseButtons()
       align = "center"
   }
 
-  local usefulPhraseText = display.newText(options)
+  usefulPhraseText = display.newText(options)
   usefulPhraseText:setFillColor( 1, 1, 1 )
+
+  -- Create the useful phrase scroll view
+  usefulPhraseScrollView = widget.newScrollView(
+    {
+        top = 100,
+        left = 0,
+        width = display.contentWidth,
+        height = 350,
+        scrollWidth = display.contentWidth,
+        scrollHeight = 1600,
+        horizontalScrollDisabled = true,
+        listener = scrollListener
+    }
+  )
+
+  local txt = display.newText( "Hello", 160,10,native.systemFont,16)
+  txt:setTextColor(0)
+  local txt2 = display.newText( "Hello again", 160,30,native.systemFont,16)
+  txt2:setTextColor(0)
+
+  local background = textAreaRectangle
+  usefulPhraseScrollView:insert(background)
+  usefulPhraseScrollView:insert(txt)
+  usefulPhraseScrollView:insert(txt2)
+end
+
+-- scroll listener for useful phrase section
+function scrollListener( event )
+ 
+    local phase = event.phase
+    if ( phase == "began" ) then print( "Scroll view was touched" )
+    elseif ( phase == "moved" ) then print( "Scroll view was moved" )
+    elseif ( phase == "ended" ) then print( "Scroll view was released" )
+    end
+ 
+    -- In the event a scroll limit is reached...
+    if ( event.limitReached ) then
+        if ( event.direction == "up" ) then print( "Reached bottom limit" )
+        elseif ( event.direction == "down" ) then print( "Reached top limit" )
+        elseif ( event.direction == "left" ) then print( "Reached right limit" )
+        elseif ( event.direction == "right" ) then print( "Reached left limit" )
+        end
+    end
+ 
+    return true
+end
+  
+function hideUsefulPhraseButtons()
+  myRectangle.isVisible = false
+  textAreaRectangle.isVisible = false
+  usefulPhraseText.isVisible = false
+  usefulPhraseScrollView.isVisible = false
 end
 
 countryButtons = {
