@@ -17,6 +17,7 @@ local path = system.pathForFile( "data.db", system.ResourceDirectory )
 local db = sqlite3.open( path )  
 
 local currentCountryId = 1
+local userType = 0
 
 -- List for placing currently active buttons for easier hiding
 currentButtons = {}
@@ -102,6 +103,8 @@ local function handleInput( event )
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
+  elseif id == 12 then
+    submitRegistration()
   elseif id == 13 then
 	  hideButtons (registrationButtons)
 	  showButtons (loginButtons)
@@ -142,10 +145,23 @@ local function searchListenerCountry( event )
   end
 end
 
+function submitRegistration()
+  query = [[INSERT INTO user (email, password, name, mobilenum, nokemail, nokname, nokmobile) VALUES ("]] 
+    .. inputRegEmail.text .. [[", "]] .. inputRegPassword.text .. [[", "]] .. inputFname.text .. " " .. inputSname.text 
+    .. [[", "]] .. inputMobile.text .. [[", "]] .. inputKinEmail.text .. [[", "]] .. inputKinFname.text .. " " .. inputKinSname.text
+    .. [[", "]] .. inputKinMobile.text .. [[");]]
+  db:exec(query)
+end
+
 function loginAccepted()
   query = [[SELECT * FROM user WHERE email="]] .. inputLoadEmail.text .. [["]]
   for row in db:nrows(query) do
-    return row.password == inputLoadPassword.text
+    if row.password == inputLoadPassword.text then
+      userType = row.usertype
+      print("User type = " .. userType)
+      return true
+    end
+    return false
   end
 end
 
@@ -326,6 +342,7 @@ inputRegPassword.y = display.contentHeight/2.1
 inputRegPassword:setTextColor(0,0,0) 
 --set input type
 inputRegPassword.inputType = "default"
+inputRegPassword.isSecure = true
 --define the placeholder
 inputRegPassword.placeholder = "-- insert password --"
 --set font
