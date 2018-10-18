@@ -615,6 +615,7 @@ function usefulPhraseButtons()
     }
   )
 
+  -- test text
   local txt = display.newText( "Hello", 160,10,native.systemFont,16)
   txt:setTextColor(0)
   local txt2 = display.newText( "Hello again", 160,30,native.systemFont,16)
