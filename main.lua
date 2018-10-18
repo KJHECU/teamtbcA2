@@ -102,6 +102,9 @@ local function handleInput( event )
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
+  elseif id == 13 then
+	  hideButtons (registrationButtons)
+	  showButtons (loginButtons)
   elseif id == 99 then
     hideButtons(currentButtons)
     populateScroll(countryScroll, nil)
@@ -505,8 +508,8 @@ loginButtons = {
   }
 
 registrationButtons = {
-		addButton( 12, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Confirm'),
-		addButton( 13, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "",  'Back'),
+		addButton( 12, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
+		addButton( 13, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
 	backRegistration,
 	txtRegistration,
 	backRegEmail,
