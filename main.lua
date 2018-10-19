@@ -29,48 +29,6 @@ local function onSystemEvent( event )
     end
 end
 
--- Configure tab buttons
-local tabButtons = {
-    {
-        width = 40, 
-        height = 50,
-        defaultFile = "baseline_menu_white_18dp.png",
-        overFile = "baseline_menu_white_18dp.png",
-        id = "tab1",
-        labelXOffset = -20,
-        onPress = handleInput
-    },
-    {
-        width = 180,
-        height = 70,
-        --label = "App Name",
-        defaultFile = "app_name_28.png",
-        overFile = "app_name_28.png",
-        id = "tab2",
-        onPress = handleInput
-    } 
-}
- 
--- Create the widget
-local tabBar = widget.newTabBar(
-    {
-        backgroundFile = "tab_bar_background.png",
-        tabSelectedLeftFile = "transparent_image.png", 
-        tabSelectedRightFile = "transparent_image.png",  
-        tabSelectedMiddleFile = "transparent_image.png",
-        tabSelectedFrameWidth = 1,
-        tabSelectedFrameHeight = 1,
-        top = -53,
-        top = display.screenOriginY - 10,
-        height = 52,
-        width = display.contentWidth,
-        --label = "App Name",
-        buttons = tabButtons
-    }
-)
-
--- end top menu section
-
 -- array of Widgets to show the buttons
 local buttons
 local buttonFillColor = { default={0, 0.8, 0.8, 1 }, over={0, 0.8, 0.8, 1} }
@@ -82,7 +40,7 @@ local function handleInput( event )
   print("button push " .. id)
   if id == 2 then
     hideButtons(currentButtons)
-    hideUsefulPhraseButtons()
+    hideButtons(usefulPhraseButtons)
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   elseif id == 4 then
@@ -97,7 +55,7 @@ local function handleInput( event )
     showButtons(menuBarButtons)
   elseif id == 7 then
     hideButtons(phraseButtons)
-    usefulPhraseButtons()
+    showButtons(usefulPhraseButtons)
     showButtons(menuBarButtons)
   elseif id == 10 then
     if loginAccepted() then
@@ -111,8 +69,8 @@ local function handleInput( event )
   elseif id == 12 then
     submitRegistration()
   elseif id == 13 then
-	  hideButtons (registrationButtons)
-	  showButtons (loginButtons)
+	  hideButtons(registrationButtons)
+	  showButtons(loginButtons)
   elseif id == 99 then
     hideButtons(currentButtons)
     populateScroll(countryScroll, nil)
@@ -229,8 +187,6 @@ panicSettingsButton = display.newImage("User-Profile.png")
   panicSettingsButton:scale(0.12, 0.12)
   panicSettingsButton.y = display.contentHeight + 10
   panicSettingsButton.x = 7.75*display.contentWidth/10
-
-
   
 -- login feature which is enabled by default --
 
@@ -440,18 +396,6 @@ function getScroll( scrollType )
   return scroll
 end
 
-lawyerScroll = getScroll( "lawyer" )
-lawyerSearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
-lawyerSearch.placeholder = "Search Lawyer"
-lawyerSearch.id = "lawyerId"
-lawyerSearch:addEventListener("userInput", searchListenerLaw)
-
-countryScroll = getScroll( "country" )
-countrySearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
-countrySearch.placeholder = "Search Country"
-countrySearch.id = "countryId"
-countrySearch:addEventListener("userInput", searchListenerCountry)
-
 function addButtonToScroll(scroll, row, num)
   button = widget.newButton(
     {
@@ -472,21 +416,60 @@ function addButtonToScroll(scroll, row, num)
   table.insert(currentButtons, button)
 end
 
+lawyerScroll = getScroll( "lawyer" )
+lawyerSearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
+lawyerSearch.placeholder = "Search Lawyer"
+lawyerSearch.id = "lawyerId"
+lawyerSearch:addEventListener("userInput", searchListenerLaw)
+
+countryScroll = getScroll( "country" )
+countrySearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
+countrySearch.placeholder = "Search Country"
+countrySearch.id = "countryId"
+countrySearch:addEventListener("userInput", searchListenerCountry)
+
+usefulPhraseScroll = getScroll( "usefulphrase" )
+usefulPhraseRectangle = display.newRect(display.contentCenterX, 80, display.contentWidth, 35)
+usefulPhraseRectangle.strokeWidth = 3
+usefulPhraseRectangle:setFillColor(0, 0.8, 0.8, 1 )
+usefulPhraseRectangle:setStrokeColor(0, 0.8, 0.8, 1 )
+usefulPhraseText = display.newText(
+  {
+    text = "Useful phrases",     
+    x = display.contentWidth / 2,
+    y = 80,
+    width = display.contentWidth / 2,  
+    fontSize = 20,
+    align = "center"
+  }
+)
+usefulPhraseText:setFillColor( 1, 1, 1 )
+
+-- test text -- Replace with code to 
+local txt = display.newText( "Hello", 160,10,native.systemFont,16)
+txt:setTextColor(0)
+local txt2 = display.newText( "Hello again", 160,30,native.systemFont,16)
+txt2:setTextColor(0)
+usefulPhraseScroll:insert(txt)
+usefulPhraseScroll:insert(txt2)
+
 function populateScroll( scroll, search )
+  order = false
   if scroll == lawyerScroll then
     if search == nil then
       query = [[SELECT * FROM lawyer WHERE countryid=]] .. currentCountryId
     else
       query = [[SELECT * FROM lawyer WHERE UPPER(name) LIKE "%]] .. search:upper() .. [[%" AND countryid=]] .. currentCountryId
     end
-  else
+    query = query .. [[ ORDER BY name ASC]]
+  elseif scroll == countryScroll then
     if search == nil then
       query = [[SELECT * FROM country]]
     else
       query = [[SELECT * FROM country WHERE UPPER(name) LIKE "%]] .. search:upper() .. [[%"]]
     end
+    query = query .. [[ ORDER BY name ASC]]
   end
-  query = query .. [[ ORDER BY name ASC]]
   i = 0
   for row in db:nrows(query) do
     addButtonToScroll(scroll, row, i)
@@ -530,8 +513,8 @@ loginButtons = {
   }
 
 registrationButtons = {
-		addButton( 12, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
-		addButton( 13, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
+  addButton( 12, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
+  addButton( 13, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
 	backRegistration,
 	txtRegistration,
 	backRegEmail,
@@ -570,94 +553,16 @@ localLawyerButtons = {
   lawyerSearch
 }
 
--- useful phrase section
-function usefulPhraseButtons()
-  
-  countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, "", 'Current Country: Australia')
-
-  -- background for useful phrase text
-  myRectangle = display.newRect(display.contentCenterX, 90, display.contentWidth, 50)
-  myRectangle.strokeWidth = 3
-  myRectangle:setFillColor(0, 0.8, 0.8, 1 )
-  myRectangle:setStrokeColor(0, 0.8, 0.8, 1 )
-
-  -- background for text area
-  textAreaRectangle = display.newRect(display.contentCenterX, 280, display.contentWidth, 330)
-  textAreaRectangle.strokeWidth = 3
-  textAreaRectangle:setFillColor(1, 1, 1)
-  textAreaRectangle:setStrokeColor(1, 1, 1)
-
-  local options = 
-  {
-      text = "Useful phrases",     
-      x = display.contentWidth / 2,
-      y = 90,
-      width = display.contentWidth / 2,
-      font = "Roboto-Medium.ttf",   
-      fontSize = 20,
-      align = "center"
-  }
-
-  usefulPhraseText = display.newText(options)
-  usefulPhraseText:setFillColor( 1, 1, 1 )
-
-  -- Create the useful phrase scroll view
-  usefulPhraseScrollView = widget.newScrollView(
-    {
-        top = 100,
-        left = 0,
-        width = display.contentWidth,
-        height = 350,
-        scrollWidth = display.contentWidth,
-        scrollHeight = 1600,
-        horizontalScrollDisabled = true,
-        listener = scrollListener
-    }
-  )
-
-  -- test text
-  local txt = display.newText( "Hello", 160,10,native.systemFont,16)
-  txt:setTextColor(0)
-  local txt2 = display.newText( "Hello again", 160,30,native.systemFont,16)
-  txt2:setTextColor(0)
-
-  local background = textAreaRectangle
-  usefulPhraseScrollView:insert(background)
-  usefulPhraseScrollView:insert(txt)
-  usefulPhraseScrollView:insert(txt2)
-end
-
--- scroll listener for useful phrase section
-function scrollListener( event )
- 
-    local phase = event.phase
-    if ( phase == "began" ) then print( "Scroll view was touched" )
-    elseif ( phase == "moved" ) then print( "Scroll view was moved" )
-    elseif ( phase == "ended" ) then print( "Scroll view was released" )
-    end
- 
-    -- In the event a scroll limit is reached...
-    if ( event.limitReached ) then
-        if ( event.direction == "up" ) then print( "Reached bottom limit" )
-        elseif ( event.direction == "down" ) then print( "Reached top limit" )
-        elseif ( event.direction == "left" ) then print( "Reached right limit" )
-        elseif ( event.direction == "right" ) then print( "Reached left limit" )
-        end
-    end
- 
-    return true
-end
-  
-function hideUsefulPhraseButtons()
-  myRectangle.isVisible = false
-  textAreaRectangle.isVisible = false
-  usefulPhraseText.isVisible = false
-  usefulPhraseScrollView.isVisible = false
-end
-
 countryButtons = {
   countryScroll,
   countrySearch
+}
+
+usefulPhraseButtons = {
+  countrySelectButton,
+  usefulPhraseScroll,
+  usefulPhraseText,
+  usefulPhraseRectangle
 }
   
 function showButtons(buttons)
@@ -674,6 +579,7 @@ function hideButtons(buttons)
     currentButtons = {}
 end
 
+hideButtons(usefulPhraseButtons)
 hideButtons(countryButtons)
 hideButtons(phraseButtons)
 hideButtons(menuBarButtons)
