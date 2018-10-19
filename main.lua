@@ -1,8 +1,15 @@
------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
 --
 -- main.lua
 --
 -----------------------------------------------------------------------------------------
+
+-- background image properties
+
+local background = display.newImage("Background.jpg")
+background.anchorX = 0
+background.anchorY = 0
+background:scale(0.45, 0.72)
 
 local widget = require( "widget" )
 local sqlite3 = require( "sqlite3" )
@@ -42,7 +49,7 @@ local function handleInput( event )
     lawyerScroll.isVisible = true
     showButtons(localLawyerButtons)
     showButtons(menuBarButtons)
-   elseif id == 5 then
+  elseif id == 5 then
     hideButtons(mainMenuButtons)
     showButtons(phraseMenuButtons)
     showButtons(menuBarButtons)
@@ -158,22 +165,6 @@ local function addButton( ID, x, y, width, height, btnType, label )
           height = height
         }
       )  
-    elseif btnType == "currentcountry" then
-    button = widget.newButton(
-        {
-          label = label,
-          shape = "roundedRect",
-          cornerRadius = 10,
-          fillColor = { default = { 1, 1, 1,}, over = { 0.8, 0.8, 0.8,} },
-          strokeColor = { default = { 1, 1, 1,}, over = { 0.8, 0.8, 0.8,} },
-          labelColor = { default = { 0, 0, 0 }, over = { 0, 0, 0} },
-          strokeWidth = 2,
-          onRelease = handleInput,
-          width = width/.6,
-          height = height/1.5,
-		  fontSize = 13
-        }
-      )   
   else
     button = widget.newButton(
         {
@@ -206,16 +197,11 @@ panicSettingsButton = display.newImage("User-Profile.png")
   panicSettingsButton:scale(0.12, 0.12)
   panicSettingsButton.y = display.contentHeight + 10
   panicSettingsButton.x = 7.75*display.contentWidth/10
-
--- background display 
-
-local background = display.newImage("Background.jpg")
-background.anchorX = 0
-background.anchorY = 0
-background:scale(0.45, 0.72)
   
--- login form --
--- username
+-- login feature which is enabled by default --
+
+-- username capture
+
 backLoadEmail = display.newRect(display.contentWidth/2, display.contentHeight/6.65, display.contentWidth, display.contentHeight/15)
 backLoadEmail:setFillColor (0, 0.8, 0.8)
 inputLoadEmail = native.newTextField(0,0,200,30)
@@ -223,12 +209,15 @@ txtLoadEmail = display.newText( "Email",display.contentWidth/0.8, display.conten
 inputLoadEmail.x = display.contentWidth/2.9
 inputLoadEmail.y = display.contentHeight/6.6
 inputLoadEmail:setTextColor(0,0,0)
+--set input type
 inputLoadEmail.inputType = "default"
+--define the placeholder
 inputLoadEmail.placeholder = "-- insert email--"
+--set font
 inputLoadEmail.font = native.newFont(native.systemFont, 12)
 native.setKeyboardFocus(inputLoadEmail)
 
--- password 
+-- password capture
 backLoadPassword = display.newRect(display.contentWidth/2, display.contentHeight/4.2, display.contentWidth, display.contentHeight/15)
 backLoadPassword:setFillColor (0, 0.8, 0.8)
 inputLoadPassword = native.newTextField(0,0,200,30)
@@ -236,14 +225,16 @@ txtLoadPassword = display.newText( "Password", display.contentWidth/0.83, displa
 inputLoadPassword.x = display.contentWidth/2.9
 inputLoadPassword.y = display.contentHeight/4.2
 inputLoadPassword:setTextColor(0,0,0) 
+--set input type
 inputLoadPassword.inputType = "default"
 inputLoadPassword.isSecure = true
+--define the placeholder
 inputLoadPassword.placeholder = "-- insert password --"
+--set font
 inputLoadPassword.font = native.newFont(native.systemFont, 12)
 
-
--- registration form --
--- registration header
+------- registration fields
+-- registration label
 backRegistration = display.newRect(display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15)
 backRegistration:setFillColor (0, 0.8, 0.8)
 txtRegistration = display.newText("REGISTRATION", display.contentWidth/2.5, display.contentHeight/13.5, display.contentWidth, display.contentHeight/15, native.systemFont, 16)
@@ -259,8 +250,11 @@ txtRegEmail = display.newText( "Email",display.contentWidth/0.84, display.conten
 inputRegEmail.x = display.contentWidth/2.9
 inputRegEmail.y = display.contentHeight/6.2
 inputRegEmail:setTextColor(0,0,0)
+--set input type
 inputRegEmail.inputType = "default"
+--define the placeholder
 inputRegEmail.placeholder = "-- insert email--"
+--set font
 inputRegEmail.font = native.newFont(native.systemFont, 12)
 native.setKeyboardFocus(inputEmail)
 
@@ -272,8 +266,11 @@ txtFname = display.newText( "First Name", display.contentWidth/0.84, display.con
 inputFname.x = display.contentWidth/2.9
 inputFname.y = display.contentHeight/4.2
 inputFname:setTextColor(0,0,0) 
+--set input type
 inputFname.inputType = "default"
+--define the placeholder
 inputFname.placeholder = "-- insert first name --"
+--set font
 inputFname.font = native.newFont(native.systemFont, 12)
 
 -- Surname
@@ -284,8 +281,11 @@ txtSname = display.newText( "Surname", display.contentWidth/0.84, display.conten
 inputSname.x = display.contentWidth/2.9
 inputSname.y = display.contentHeight/3.1
 inputSname:setTextColor(0,0,0) 
+--set input type
 inputSname.inputType = "default"
+--define the placeholder
 inputSname.placeholder = "-- insert first name --"
+--set font
 inputSname.font = native.newFont(native.systemFont, 12)
 
 -- Mobile No
@@ -296,8 +296,11 @@ txtMobile = display.newText( "Mobile no", display.contentWidth/0.84, display.con
 inputMobile.x = display.contentWidth/2.9
 inputMobile.y = display.contentHeight/2.5
 inputMobile:setTextColor(0,0,0) 
+--set input type
 inputMobile.inputType = "default"
+--define the placeholder
 inputMobile.placeholder = "-- insert first name --"
+--set font
 inputMobile.font = native.newFont(native.systemFont, 12)
 
 -- Password
@@ -308,9 +311,12 @@ txtRegPassword = display.newText( "Password", display.contentWidth/0.84, display
 inputRegPassword.x = display.contentWidth/2.9
 inputRegPassword.y = display.contentHeight/2.1
 inputRegPassword:setTextColor(0,0,0) 
+--set input type
 inputRegPassword.inputType = "default"
 inputRegPassword.isSecure = true
+--define the placeholder
 inputRegPassword.placeholder = "-- insert password --"
+--set font
 inputRegPassword.font = native.newFont(native.systemFont, 12)
 
 
@@ -327,8 +333,11 @@ txtKinEmail = display.newText( "Email", display.contentWidth/0.84, display.conte
 inputKinEmail.x = display.contentWidth/2.9
 inputKinEmail.y = display.contentHeight/1.57
 inputKinEmail:setTextColor(0,0,0) 
+--set input type
 inputKinEmail.inputType = "default"
+--define the placeholder
 inputKinEmail.placeholder = "-- insert NOK first name --"
+--set font
 inputKinEmail.font = native.newFont(native.systemFont, 12)
 
 -- Next of Kin First Name
@@ -339,11 +348,14 @@ txtKinFname = display.newText( "First Name", display.contentWidth/0.84, display.
 inputKinFname.x = display.contentWidth/2.9
 inputKinFname.y = display.contentHeight/1.4
 inputKinFname:setTextColor(0,0,0) 
+--set input type
 inputKinFname.inputType = "default"
+--define the placeholder
 inputKinFname.placeholder = "-- insert NOK first name --"
+--set font
 inputKinFname.font = native.newFont(native.systemFont, 12)
 
--- Next of Kin Surname
+-- Next of Kin SurnName
 backKinSname = display.newRect(display.contentWidth/2, display.contentHeight/1.27, display.contentWidth, display.contentHeight/15)
 backKinSname:setFillColor (0, 0.8, 0.8)
 inputKinSname = native.newTextField(0,0,200,30)
@@ -351,8 +363,11 @@ txtKinSname = display.newText( "Surname", display.contentWidth/0.84, display.con
 inputKinSname.x = display.contentWidth/2.9
 inputKinSname.y = display.contentHeight/1.27
 inputKinSname:setTextColor(0,0,0) 
+--set input type
 inputKinSname.inputType = "default"
+--define the placeholder
 inputKinSname.placeholder = "-- insert NOK Surname --"
+--set font
 inputKinSname.font = native.newFont(native.systemFont, 12)
 
 -- Next of Kin Mobile no
@@ -363,12 +378,16 @@ txtKinMobile = display.newText( "Mobile no", display.contentWidth/0.84, display.
 inputKinMobile.x = display.contentWidth/2.9
 inputKinMobile.y = display.contentHeight/1.16
 inputKinMobile:setTextColor(0,0,0) 
+--set input type
 inputKinMobile.inputType = "default"
+--define the placeholder
 inputKinMobile.placeholder = "-- insert NOK Mobile --"
+--set font
 inputKinMobile.font = native.newFont(native.systemFont, 12)
 
 
 -- scroll pane for local lawyer & country lists
+
 function getScroll( scrollType )
   scroll = widget.newScrollView(
   {
@@ -513,28 +532,8 @@ phraseText = display.newText(
 )
 phraseText:setFillColor( 1, 1, 1 )
 
+countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, "", 'Current Country: Australia')
 
--- Current Country display group (inc button)
-
-local countryGroup = display.newGroup()
-
-local globe = display.newImage("globe.png" ,display.contentWidth/5, display.contentHeight/10)
-globe:scale(.125,.125)
-countryGroup:insert(globe)
-
-
-local fingerPress = display.newImage ("fingerpress.png",display.contentWidth/1.15, display.contentHeight/10)
-fingerPress:scale(.4, .4)
-countryGroup:insert(fingerPress)
-
-countrySelectButton = addButton( 99, display.contentWidth/1.9, display.contentHeight/10, display.contentWidth, display.contentHeight/10, "currentcountry", 'Current Country: Australia')
-countryGroup:insert(countrySelectButton)
-countrySelectButton:toBack()
-
-
--- Buttons tables used as overarching navigation
-
--- lower horizontal menu buttons
 menuBarButtons = {
     addButton( 1, display.contentWidth/2, display.contentHeight + 10, 130, 38, "panic", 'Panic Button'), 
     addButton( 2, homeButton.x, homeButton.y, homeButton.width*0.22, homeButton.height*0.22, "icon", homeButton ),
@@ -542,24 +541,21 @@ menuBarButtons = {
     homeButton,
     panicSettingsButton
   }
- 
--- main menu
+  
 mainMenuButtons = {
     countrySelectButton,
 		addButton( 4, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Local Lawyers'),
 		addButton( 5, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Phrase Translation'), 
 		addButton( 6, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Useful Contacts'), 
   }
-
--- phrase menu
+  
 phraseMenuButtons = {
     countrySelectButton,
 		addButton( 7, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Useful Phrases'),
 		addButton( 8, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Legal Phrases'), 
 		addButton( 9, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Favourite Phrases'), 
   }
-
--- login menu
+  
 loginButtons = {
 		addButton( 10, display.contentWidth/2, 6*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Login'),
 		addButton( 11, display.contentWidth/2, 7*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "",  'Register'),
@@ -571,7 +567,6 @@ loginButtons = {
     inputLoadPassword,
   }
 
--- registration page
 registrationButtons = {
   addButton( 12, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
   addButton( 13, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
@@ -605,31 +600,26 @@ registrationButtons = {
 	txtKinSname,
 	backKinMobile,
 	inputKinMobile,
-	txtKinMobile,
-	
+	txtKinMobile
 }
 
--- lawyers buttons
 localLawyerButtons = {
   lawyerScroll,
   lawyerSearch
 }
 
--- country buttons
 countryButtons = {
   countryScroll,
   countrySearch
 }
 
--- phrase buttons
 phraseButtons = {
   countrySelectButton,
   phraseScroll,
   phraseText,
   phraseRectangle
 }
-
--- functions which control hiding and showing buttons
+  
 function showButtons(buttons)
     for _, button in pairs(buttons) do
       button.isVisible = true
@@ -644,7 +634,6 @@ function hideButtons(buttons)
     currentButtons = {}
 end
 
--- on load, show Login Buttons, hide remainder
 hideButtons(phraseButtons)
 hideButtons(countryButtons)
 hideButtons(phraseMenuButtons)
