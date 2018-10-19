@@ -40,7 +40,7 @@ local function handleInput( event )
   print("button push " .. id)
   if id == 2 then
     hideButtons(currentButtons)
-    hideButtons(usefulPhraseButtons)
+    hideButtons(phraseButtons)
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   elseif id == 4 then
@@ -51,13 +51,21 @@ local function handleInput( event )
     showButtons(menuBarButtons)
   elseif id == 5 then
     hideButtons(mainMenuButtons)
-    showButtons(phraseButtons)
+    showButtons(phraseMenuButtons)
     showButtons(menuBarButtons)
   elseif id == 7 then
-    hideButtons(phraseButtons)
-    populatePhrases(usefulPhraseScroll, nil)
-    usefulPhraseScroll.isVisible = true
-    showButtons(usefulPhraseButtons)
+    hideButtons(phraseMenuButtons)
+    phraseText.text = "Useful Phrases"
+    populatePhrases(phraseScroll, nil, 0)
+    phraseScroll.isVisible = true
+    showButtons(phraseButtons)
+    showButtons(menuBarButtons)
+  elseif id == 8 then
+    hideButtons(phraseMenuButtons)
+    phraseText.text = "Legal Phrases"
+    populatePhrases(phraseScroll, nil, 1)
+    phraseScroll.isVisible = true
+    showButtons(phraseButtons)
     showButtons(menuBarButtons)
   elseif id == 10 then
     if loginAccepted() then
@@ -490,12 +498,7 @@ function addPhraseToScroll(scroll, row, num)
   table.insert(currentButtons, bg2)
 end
 
-function populatePhrases( scroll, search )
-  if scroll == usefulPhraseScroll then
-    phraseType = 0
-  else
-    phraseType = 1
-  end
+function populatePhrases( scroll, search, phraseType )
   if search == nil then
     query = [[SELECT * FROM phrase WHERE countryid=]] .. currentCountryId .. [[ AND phrasetype=]] .. phraseType
   else
@@ -512,14 +515,14 @@ function populatePhrases( scroll, search )
   end
 end
 
-usefulPhraseScroll = getScroll( "usefulphrase" )
-usefulPhraseRectangle = display.newRect(display.contentCenterX, 80, display.contentWidth, 35)
-usefulPhraseRectangle.strokeWidth = 3
-usefulPhraseRectangle:setFillColor(0, 0.8, 0.8, 1 )
-usefulPhraseRectangle:setStrokeColor(0, 0.8, 0.8, 1 )
-usefulPhraseText = display.newText(
+phraseScroll = getScroll( "phrase" )
+phraseRectangle = display.newRect(display.contentCenterX, 80, display.contentWidth, 35)
+phraseRectangle.strokeWidth = 3
+phraseRectangle:setFillColor(0, 0.8, 0.8, 1 )
+phraseRectangle:setStrokeColor(0, 0.8, 0.8, 1 )
+phraseText = display.newText(
   {
-    text = "Useful phrases",     
+    text = " phrases",     
     x = display.contentWidth / 2,
     y = 80,
     width = display.contentWidth / 2,  
@@ -527,7 +530,7 @@ usefulPhraseText = display.newText(
     align = "center"
   }
 )
-usefulPhraseText:setFillColor( 1, 1, 1 )
+phraseText:setFillColor( 1, 1, 1 )
 
 countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, "", 'Current Country: Australia')
 
@@ -546,7 +549,7 @@ mainMenuButtons = {
 		addButton( 6, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Useful Contacts'), 
   }
   
-phraseButtons = {
+phraseMenuButtons = {
     countrySelectButton,
 		addButton( 7, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Useful Phrases'),
 		addButton( 8, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Legal Phrases'), 
@@ -610,11 +613,11 @@ countryButtons = {
   countrySearch
 }
 
-usefulPhraseButtons = {
+phraseButtons = {
   countrySelectButton,
-  usefulPhraseScroll,
-  usefulPhraseText,
-  usefulPhraseRectangle
+  phraseScroll,
+  phraseText,
+  phraseRectangle
 }
   
 function showButtons(buttons)
@@ -631,9 +634,9 @@ function hideButtons(buttons)
     currentButtons = {}
 end
 
-hideButtons(usefulPhraseButtons)
-hideButtons(countryButtons)
 hideButtons(phraseButtons)
+hideButtons(countryButtons)
+hideButtons(phraseMenuButtons)
 hideButtons(menuBarButtons)
 hideButtons(localLawyerButtons)
 showButtons(loginButtons)
