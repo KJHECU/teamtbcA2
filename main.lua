@@ -55,6 +55,8 @@ local function handleInput( event )
     showButtons(menuBarButtons)
   elseif id == 7 then
     hideButtons(phraseButtons)
+    populatePhrases(usefulPhraseScroll, nil)
+    usefulPhraseScroll.isVisible = true
     showButtons(usefulPhraseButtons)
     showButtons(menuBarButtons)
   elseif id == 10 then
@@ -428,31 +430,6 @@ countrySearch.placeholder = "Search Country"
 countrySearch.id = "countryId"
 countrySearch:addEventListener("userInput", searchListenerCountry)
 
-usefulPhraseScroll = getScroll( "usefulphrase" )
-usefulPhraseRectangle = display.newRect(display.contentCenterX, 80, display.contentWidth, 35)
-usefulPhraseRectangle.strokeWidth = 3
-usefulPhraseRectangle:setFillColor(0, 0.8, 0.8, 1 )
-usefulPhraseRectangle:setStrokeColor(0, 0.8, 0.8, 1 )
-usefulPhraseText = display.newText(
-  {
-    text = "Useful phrases",     
-    x = display.contentWidth / 2,
-    y = 80,
-    width = display.contentWidth / 2,  
-    fontSize = 20,
-    align = "center"
-  }
-)
-usefulPhraseText:setFillColor( 1, 1, 1 )
-
--- test text -- Replace with code to 
-local txt = display.newText( "Hello", 160,10,native.systemFont,16)
-txt:setTextColor(0)
-local txt2 = display.newText( "Hello again", 160,30,native.systemFont,16)
-txt2:setTextColor(0)
-usefulPhraseScroll:insert(txt)
-usefulPhraseScroll:insert(txt2)
-
 function populateScroll( scroll, search )
   order = false
   if scroll == lawyerScroll then
@@ -477,6 +454,81 @@ function populateScroll( scroll, search )
   end
 end
 
+-- scroll panes for phrase lists
+function addPhraseToScroll(scroll, row, num)
+  button1 = display.newText(
+    {
+      text = row.english,
+      height = display.contentHeight/8.4,
+      width = display.contentWidth - 30,
+      x = display.contentWidth/2,
+      y = (num * 60) + 30
+    }
+  )
+  button2 = display.newText(
+    {
+      text = row.translated,
+      height = display.contentHeight/8.4,
+      width = display.contentWidth - 60,
+      x = display.contentWidth/2 + 30,
+      y = button1.y + display.contentHeight/8.4
+    }
+  )
+  bg1 = display.newRect( button1.x, button1.y - 20, display.contentWidth, button1.height + 10 )
+  bg1:setFillColor(1,1,1)
+  bg2 = display.newRect( button2.x - 10, button2.y - 20, button2.width + 20, button2.height + 10 )
+  bg2:setFillColor(1,1,1)
+  button1:setFillColor(black)
+  button2:setFillColor(black)
+  scroll:insert(bg1)
+  scroll:insert(button1)
+  scroll:insert(bg2)
+  scroll:insert(button2)
+  table.insert(currentButtons, button1)
+  table.insert(currentButtons, bg1)
+  table.insert(currentButtons, button2)
+  table.insert(currentButtons, bg2)
+end
+
+function populatePhrases( scroll, search )
+  if scroll == usefulPhraseScroll then
+    phraseType = 0
+  else
+    phraseType = 1
+  end
+  if search == nil then
+    query = [[SELECT * FROM phrase WHERE countryid=]] .. currentCountryId .. [[ AND phrasetype=]] .. phraseType
+  else
+    query = [[SELECT * FROM phrase WHERE UPPER(english) LIKE "%]] 
+    .. search:upper() .. [[%" AND countryid=]] .. currentCountryId 
+    .. [[ AND phrasetype=]] .. phraseType
+  end
+  query = query .. [[ ORDER BY english ASC]]
+  print("Query = " .. query)
+  i = 0
+  for row in db:nrows(query) do
+    addPhraseToScroll(scroll, row, i)
+    i = i + 2
+  end
+end
+
+usefulPhraseScroll = getScroll( "usefulphrase" )
+usefulPhraseRectangle = display.newRect(display.contentCenterX, 80, display.contentWidth, 35)
+usefulPhraseRectangle.strokeWidth = 3
+usefulPhraseRectangle:setFillColor(0, 0.8, 0.8, 1 )
+usefulPhraseRectangle:setStrokeColor(0, 0.8, 0.8, 1 )
+usefulPhraseText = display.newText(
+  {
+    text = "Useful phrases",     
+    x = display.contentWidth / 2,
+    y = 80,
+    width = display.contentWidth / 2,  
+    fontSize = 20,
+    align = "center"
+  }
+)
+usefulPhraseText:setFillColor( 1, 1, 1 )
+
 countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, "", 'Current Country: Australia')
 
 menuBarButtons = {
@@ -498,7 +550,7 @@ phraseButtons = {
     countrySelectButton,
 		addButton( 7, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Useful Phrases'),
 		addButton( 8, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Legal Phrases'), 
-		addButton( 9, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Set Favourite Phrases'), 
+		addButton( 9, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Favourite Phrases'), 
   }
   
 loginButtons = {
