@@ -42,7 +42,7 @@ local function handleInput( event )
     lawyerScroll.isVisible = true
     showButtons(localLawyerButtons)
     showButtons(menuBarButtons)
-  elseif id == 5 then
+   elseif id == 5 then
     hideButtons(mainMenuButtons)
     showButtons(phraseMenuButtons)
     showButtons(menuBarButtons)
@@ -522,6 +522,7 @@ local globe = display.newImage("globe.png" ,display.contentWidth/5, display.cont
 globe:scale(.125,.125)
 countryGroup:insert(globe)
 
+
 local fingerPress = display.newImage ("fingerpress.png",display.contentWidth/1.15, display.contentHeight/10)
 fingerPress:scale(.4, .4)
 countryGroup:insert(fingerPress)
@@ -529,6 +530,7 @@ countryGroup:insert(fingerPress)
 countrySelectButton = addButton( 99, display.contentWidth/1.9, display.contentHeight/10, display.contentWidth, display.contentHeight/10, "currentcountry", 'Current Country: Australia')
 countryGroup:insert(countrySelectButton)
 countrySelectButton:toBack()
+
 
 -- Buttons tables used as overarching navigation
 
@@ -603,7 +605,8 @@ registrationButtons = {
 	txtKinSname,
 	backKinMobile,
 	inputKinMobile,
-	txtKinMobile
+	txtKinMobile,
+	
 }
 
 -- lawyers buttons
@@ -647,6 +650,6 @@ hideButtons(countryButtons)
 hideButtons(phraseMenuButtons)
 hideButtons(menuBarButtons)
 hideButtons(localLawyerButtons)
-hideButtons(loginButtons)
-showButtons(mainMenuButtons)
+showButtons(loginButtons)
+hideButtons(mainMenuButtons)
 hideButtons(registrationButtons)
