@@ -165,7 +165,23 @@ local function addButton( ID, x, y, width, height, btnType, label )
           height = height
         }
       )  
-  else
+  elseif btnType == "countrySelect" then
+    button = widget.newButton(
+        {
+          label = label,
+          shape = "roundedRect",
+          cornerRadius = 10,
+          fillColor = { default = { 1, 1, 1,}, over = { 0.8, 0.8, 0.8,} },
+          strokeColor = { default = { 1, 1, 1,}, over = { 0.8, 0.8, 0.8,} },
+          labelColor = { default = { 0, 0, 0 }, over = { 0, 0, 0} },
+          strokeWidth = 2,
+          onRelease = handleInput,
+          width = width/.6,
+          height = height/1.5,
+		  fontSize = 13
+        }
+      )  
+ else
     button = widget.newButton(
         {
           label = label,
@@ -532,7 +548,21 @@ phraseText = display.newText(
 )
 phraseText:setFillColor( 1, 1, 1 )
 
-countrySelectButton = addButton( 99, display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15, "", 'Current Country: Australia')
+-- Current Country display group (inc button)
+
+local countryGroup = display.newGroup()
+
+local globe = display.newImage("globe.png" ,display.contentWidth/5, display.contentHeight/10)
+globe:scale(.125,.125)
+countryGroup:insert(globe)
+
+local fingerPress = display.newImage ("fingerpress.png",display.contentWidth/1.15, display.contentHeight/10)
+fingerPress:scale(.4, .4)
+countryGroup:insert(fingerPress)
+
+countrySelectButton = addButton( 99, display.contentWidth/1.9, display.contentHeight/10, display.contentWidth, display.contentHeight/10, "countrySelect", 'Current Country: Australia')
+countryGroup:insert(countrySelectButton)
+countrySelectButton:toBack()
 
 menuBarButtons = {
     addButton( 1, display.contentWidth/2, display.contentHeight + 10, 130, 38, "panic", 'Panic Button'), 
@@ -543,14 +573,14 @@ menuBarButtons = {
   }
   
 mainMenuButtons = {
-    countrySelectButton,
+    countryGroup,
 		addButton( 4, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Local Lawyers'),
 		addButton( 5, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Phrase Translation'), 
 		addButton( 6, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Useful Contacts'), 
   }
   
 phraseMenuButtons = {
-    countrySelectButton,
+    countryGroup,
 		addButton( 7, display.contentWidth/2, 2*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Useful Phrases'),
 		addButton( 8, display.contentWidth/2, 3.5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Legal Phrases'), 
 		addButton( 9, display.contentWidth/2, 5*display.contentHeight/8, display.contentWidth, display.contentHeight/11.5, "", 'Favourite Phrases'), 
@@ -614,7 +644,7 @@ countryButtons = {
 }
 
 phraseButtons = {
-  countrySelectButton,
+  countryGroup,
   phraseScroll,
   phraseText,
   phraseRectangle
