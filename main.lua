@@ -336,7 +336,7 @@ inputLoadPassword.placeholder = "-- insert password --"
 --set font
 inputLoadPassword.font = native.newFont(native.systemFont, 12)
 
-loginError = display.newText( "Login Failed", display.contentWidth/1.175, display.contentHeight/8.5, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+loginError = display.newText( "Invalid Email and/or Password", display.contentWidth/1.5, display.contentHeight/8.5, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
 loginError:setFillColor (255,0,0)
 loginError.isVisible = false
 
@@ -514,27 +514,40 @@ function getScroll( scrollType )
 end
 
 function addButtonToScroll(scroll, row, num)
+  local testGroup = display.newGroup()
+  
+  local profileCircle = display.newCircle (70, 30, 15)
+  
+  profileCircle:setStrokeColor (255, 0, 0)
+  testGroup:insert(profileCircle)
+  
   button = widget.newButton(
     {
       id = scroll.id .. row.id,
       label = row.name,
       shape = "roundedRect",
       cornerRadius = 0,
-      fillColor = white,
+      fillColor = { default = { 1, 1, 1 }, over = { 1, 1, 1} },
+      labelColor = { default = { 0, 0, 0 }, over = { 0, 0, 0} },
       strokeWidth = 0,
       height = display.contentHeight/9,
-      width = 300,
+      width = 350,
       x = display.contentWidth/2,
       y = (num * 75) + 30,
-      onRelease = handleInput
+	  fontSize = 14,
+      onRelease = handleInput,
+	  	  
     }
   )
-  scroll:insert(button)
-  table.insert(currentButtons, button)
+  
+  testGroup:insert(button)
+  button:toBack()
+  scroll:insert(testGroup)
+  table.insert(currentButtons, testGroup)
 end
 
 lawyerScroll = getScroll( "lawyer" )
-lawyerSearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
+lawyerSearch = native.newTextField(display.contentWidth/2,display.contentHeight/5.5,0.9*display.contentWidth,26)
 lawyerSearch.placeholder = "Search Lawyer"
 lawyerSearch.id = "lawyerId"
 lawyerSearch:addEventListener("userInput", searchListenerLaw)
@@ -725,6 +738,7 @@ registrationButtons = {
 }
 
 localLawyerButtons = {
+  countryGroup,
   lawyerScroll,
   lawyerSearch
 }
