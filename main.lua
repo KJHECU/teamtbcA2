@@ -69,20 +69,11 @@ local function handleInput( event )
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
   elseif id == 10 then
-	if isEmpty(inputLoadEmail) then
-	  inputLoadEmail.placeholder = "Email not provided"
-	  loginForm = false
-	end
-	if isEmpty(inputLoadPassword) then
-	  inputLoadPassword.placeholder = "Password not provided"
-	  loginForm = false
-	end
-	if loginForm and loginAccepted() then
-	  hideButtons(loginButtons)
-	  showButtons(mainMenuButtons)
-	  showButtons(menuBarButtons)
-	end
-	loginForm = true
+    if loginAccepted() then
+      hideButtons(loginButtons)
+      showButtons(mainMenuButtons)
+      showButtons(menuBarButtons)
+    end
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
@@ -137,6 +128,18 @@ function submitRegistration()
 end
 
 function loginAccepted()
+  empty = false
+  if isEmpty(inputLoadEmail) then
+	  inputLoadEmail.placeholder = "Email not provided"
+    emptyField = true
+	end
+	if isEmpty(inputLoadPassword) then
+	  inputLoadPassword.placeholder = "Password not provided"
+    emptyField = true
+	end
+  if emptyField then
+    return false
+  end
   query = [[SELECT * FROM user WHERE email="]] .. inputLoadEmail.text .. [["]]
   for row in db:nrows(query) do
     if row.password == inputLoadPassword.text then
