@@ -18,6 +18,7 @@ local db = sqlite3.open( path )
 
 local currentCountryId = 1
 local userType = 0
+local loginForm = true
 
 -- List for placing currently active buttons for easier hiding
 currentButtons = {}
@@ -70,14 +71,18 @@ local function handleInput( event )
   elseif id == 10 then
 	if isEmpty(inputLoadEmail) then
 	  inputLoadEmail.placeholder = "Email not provided"
+	  loginForm = false
 	end
 	if isEmpty(inputLoadPassword) then
 	  inputLoadPassword.placeholder = "Password not provided"
-	elseif loginAccepted() then
-      hideButtons(loginButtons)
-      showButtons(mainMenuButtons)
-      showButtons(menuBarButtons)
-	 end
+	  loginForm = false
+	end
+	if loginForm and loginAccepted() then
+	  hideButtons(loginButtons)
+	  showButtons(mainMenuButtons)
+	  showButtons(menuBarButtons)
+	end
+	loginForm = true
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
