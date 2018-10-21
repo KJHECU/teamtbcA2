@@ -74,7 +74,7 @@ local function handleInput( event )
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
-	else if 
+	
     end
 
   elseif id == 11 then
