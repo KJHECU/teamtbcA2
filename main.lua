@@ -19,6 +19,7 @@ local db = sqlite3.open( path )
 local currentCountryId = 1
 local userType = 0
 local loginForm = true
+local regForm = true
 
 -- List for placing currently active buttons for easier hiding
 currentButtons = {}
@@ -81,13 +82,56 @@ local function handleInput( event )
 	  hideButtons(loginButtons)
 	  showButtons(mainMenuButtons)
 	  showButtons(menuBarButtons)
+	else 
+	  loginForm = true
 	end
-	loginForm = true
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
   elseif id == 12 then
-    submitRegistration()
+   if isEmpty(inputRegEmail) then
+     inputRegEmail.placeholder = "Email not provided"
+	 regForm = false
+	 end
+   if isEmpty(inputFname) then
+     inputFname.placeholder = "First Name not provided"
+	 regForm = false
+	 end
+	if isEmpty(inputSname) then
+     inputSname.placeholder = "Surname not provided"
+	 regForm = false
+	 end
+	if isEmpty(inputMobile) then
+     inputMobile.placeholder = "Mobile not provided"
+	 regForm = false
+	 end
+	if isEmpty(inputRegPassword) then
+     inputRegPassword.placeholder = "Password not provided"
+	 regForm = false
+	 end
+	if isEmpty(inputKinEmail) then
+     inputKinEmail.placeholder = "Email not provided"
+	 regForm = false
+	 end 
+	if isEmpty(inputKinFname) then
+     inputKinFname.placeholder = "First Name not provided"
+	 regForm = false
+	 end 
+	if isEmpty(inputKinSname) then
+     inputKinSname.placeholder = "Surname not provided"
+	 regForm = false
+	 end
+    if isEmpty(inputKinMobile) then
+     inputKinMobile.placeholder = "Mobile not provided"
+	 regForm = false
+	 end 	 
+    if regForm then 
+	 submitRegistration() 
+	 hideButtons(registrationButtons)
+	 showButtons (loginButtons)
+	else
+	 regForm = true
+	 end
   elseif id == 13 then
 	  hideButtons(registrationButtons)
 	  showButtons(loginButtons)
