@@ -18,7 +18,6 @@ local db = sqlite3.open( path )
 
 local currentCountryId = 1
 local userType = 0
-local loginForm = true
 
 -- List for placing currently active buttons for easier hiding
 currentButtons = {}
@@ -54,6 +53,11 @@ local function handleInput( event )
     hideButtons(mainMenuButtons)
     showButtons(phraseMenuButtons)
     showButtons(menuBarButtons)
+  elseif id == 6 then
+    hideButtons(mainMenuButtons)
+    showButtons(contactsButtons)
+    populateContacts(contactsScroll)
+    contactsScroll.isVisible = true
   elseif id == 7 then
     hideButtons(phraseMenuButtons)
     phraseText.text = "Useful Phrases"
@@ -69,20 +73,11 @@ local function handleInput( event )
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
   elseif id == 10 then
-	if isEmpty(inputLoadEmail) then
-	  inputLoadEmail.placeholder = "Email not provided"
-	  loginForm = false
-	end
-	if isEmpty(inputLoadPassword) then
-	  inputLoadPassword.placeholder = "Password not provided"
-	  loginForm = false
-	end
-	if loginForm and loginAccepted() then
-	  hideButtons(loginButtons)
-	  showButtons(mainMenuButtons)
-	  showButtons(menuBarButtons)
-	end
-	loginForm = true
+    if loginAccepted() then
+      hideButtons(loginButtons)
+      showButtons(mainMenuButtons)
+      showButtons(menuBarButtons)
+	 end
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
@@ -141,19 +136,12 @@ function loginAccepted()
   for row in db:nrows(query) do
     if row.password == inputLoadPassword.text then
       userType = row.usertype
+      currentUserId = row.userid
       print("User type = " .. userType)
       return true
     end
     return false
   end
-end
-
-function isEmpty(field)
-	if field.text == "" then
-		return true
-	else
-		return false
-	end
 end
 
 -- utility to make buttons
@@ -496,6 +484,42 @@ function populateScroll( scroll, search )
   end
 end
 
+-- scroll pane for useful contacts
+function addContactsToScroll(scroll, contactType, contactNum, num)
+  button = widget.newButton(
+    {
+      label = contactNum .. "\n" .. contactType,
+      shape = "roundedRect",
+      cornerRadius = 0,
+      fillColor = white,
+      strokeWidth = 0,
+      height = display.contentHeight/9,
+      width = 300,
+      x = display.contentWidth/2,
+      y = (num * 80) + 30,
+    }
+  )
+  scroll:insert(button)
+  table.insert(currentButtons, button)
+end
+
+function populateContacts ( scroll )
+  query = [[SELECT * FROM country WHERE id=]] .. currentCountryId
+  for row in db:nrows(query) do
+    addContactsToScroll(scroll, "Emergency", row.emergency, 0)
+  end
+
+  query = [[SELECT * FROM country WHERE id=]] .. currentCountryId
+  for row in db:nrows(query) do
+    addContactsToScroll(scroll, "Embassy", row.embassy, 1)
+  end
+  query = [[SELECT * FROM user WHERE userid=]] .. currentUserId 
+  for row in db:nrows(query) do
+    addContactsToScroll(scroll, "Next of Kin", row.nokname, 2)
+  end
+end
+contactsScroll = getScroll( "contacts" )
+
 -- scroll panes for phrase lists
 function addPhraseToScroll(scroll, row, num)
   button1 = display.newText(
@@ -659,6 +683,11 @@ localLawyerButtons = {
 countryButtons = {
   countryScroll,
   countrySearch
+}
+
+contactsButtons = {
+  countryGroup,
+  contactsScroll
 }
 
 phraseButtons = {
