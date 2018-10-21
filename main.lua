@@ -19,6 +19,7 @@ local db = sqlite3.open( path )
 local currentCountryId = 1
 local userType = 0
 local loginForm = true
+local regForm = true
 
 -- List for placing currently active buttons for easier hiding
 currentButtons = {}
@@ -74,11 +75,55 @@ local function handleInput( event )
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
     end
+
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
   elseif id == 12 then
-    submitRegistration()
+   if isEmpty(inputRegEmail) then
+     inputRegEmail.placeholder = "Email not provided"
+	 regForm = false
+	 end
+   if isEmpty(inputFname) then
+     inputFname.placeholder = "First Name not provided"
+	 regForm = false
+	 end
+	if isEmpty(inputSname) then
+     inputSname.placeholder = "Surname not provided"
+	 regForm = false
+	 end
+	if isEmpty(inputMobile) then
+     inputMobile.placeholder = "Mobile not provided"
+	 regForm = false
+	 end
+	if isEmpty(inputRegPassword) then
+     inputRegPassword.placeholder = "Password not provided"
+	 regForm = false
+	 end
+	if isEmpty(inputKinEmail) then
+     inputKinEmail.placeholder = "Email not provided"
+	 regForm = false
+	 end 
+	if isEmpty(inputKinFname) then
+     inputKinFname.placeholder = "First Name not provided"
+	 regForm = false
+	 end 
+	if isEmpty(inputKinSname) then
+     inputKinSname.placeholder = "Surname not provided"
+	 regForm = false
+	 end
+    if isEmpty(inputKinMobile) then
+     inputKinMobile.placeholder = "Mobile not provided"
+	 regForm = false
+	 end 	 
+    if regForm then 
+	 submitRegistration() 
+	 hideButtons(registrationButtons)
+	 showButtons (loginButtons)
+	 local regConf = native.showAlert( "Registration", "Registration for".. " " .. inputRegEmail.text.. " ".."Successful !", {"Ok"} , onRegister )
+	else
+	 regForm = true
+	 end
   elseif id == 13 then
 	  hideButtons(registrationButtons)
 	  showButtons(loginButtons)
@@ -97,6 +142,18 @@ local function handleInput( event )
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   end
+end
+
+-- local function for button click
+
+local function onRegister(event)
+	if (event.action == "clicked") and regConf then
+		local i = event.index
+		if (i ==  1) then
+	
+		end
+	
+	end
 end
 
 -- handle searching for lawyer
@@ -128,7 +185,7 @@ function submitRegistration()
 end
 
 function loginAccepted()
-  empty = false
+  emptyField = false
   if isEmpty(inputLoadEmail) then
 	  inputLoadEmail.placeholder = "Email not provided"
     emptyField = true
