@@ -18,10 +18,11 @@ local db = sqlite3.open( path )
 
 local currentCountryId = 1
 local userType = 0
-
+<<<<<<< HEAD
 local loginForm = true
 local regForm = true
-
+=======
+>>>>>>> Bi
 
 -- List for placing currently active buttons for easier hiding
 currentButtons = {}
@@ -81,12 +82,13 @@ local function handleInput( event )
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
-
+<<<<<<< HEAD
 	  loginError.isVisible = false
 	
     end
-
-
+=======
+	 end
+>>>>>>> Bi
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
@@ -200,7 +202,7 @@ end
 
 -- function which handles login
 function loginAccepted()
-
+<<<<<<< HEAD
   emptyField = false
   if isEmpty(inputLoadEmail) then
 	  inputLoadEmail.placeholder = "Email not provided"
@@ -211,7 +213,7 @@ function loginAccepted()
     emptyField = true
 	end
   if emptyField then
-
+=======
   query = [[SELECT * FROM user WHERE email="]] .. inputLoadEmail.text .. [["]]
   for row in db:nrows(query) do
     if row.password == inputLoadPassword.text then
@@ -220,7 +222,7 @@ function loginAccepted()
       print("User type = " .. userType)
       return true
     end
-
+>>>>>>> Bi
     return false
   end
   query = [[SELECT * FROM user WHERE email="]] .. inputLoadEmail.text .. [["]]
@@ -237,7 +239,7 @@ function loginAccepted()
 	return false
 end
 
-
+<<<<<<< HEAD
 -- function which checks for empty input fields
 function isEmpty(field)
 	if field.text == "" then
@@ -247,8 +249,8 @@ function isEmpty(field)
 	end
 end
 
-
-
+=======
+>>>>>>> Bi
 -- utility to make buttons
 local function addButton( ID, x, y, width, height, btnType, label )
   if btnType == "icon" then
