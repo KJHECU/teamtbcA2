@@ -70,29 +70,12 @@ local function handleInput( event )
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
   elseif id == 10 then
-<<<<<<< HEAD
-	if isEmpty(inputLoadEmail) then
-	  inputLoadEmail.placeholder = "Email not provided"
-	  loginForm = false
-	end
-	if isEmpty(inputLoadPassword) then
-	  inputLoadPassword.placeholder = "Password not provided"
-	  loginForm = false
-	end
-	if loginForm and loginAccepted() then
-	  hideButtons(loginButtons)
-	  showButtons(mainMenuButtons)
-	  showButtons(menuBarButtons)
-	else 
-	  loginForm = true
-	end
-=======
     if loginAccepted() then
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
     end
->>>>>>> master
+
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
@@ -202,7 +185,7 @@ function submitRegistration()
 end
 
 function loginAccepted()
-  empty = false
+  emptyField = false
   if isEmpty(inputLoadEmail) then
 	  inputLoadEmail.placeholder = "Email not provided"
     emptyField = true
