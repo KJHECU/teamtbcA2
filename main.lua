@@ -129,6 +129,7 @@ local function handleInput( event )
 	 submitRegistration() 
 	 hideButtons(registrationButtons)
 	 showButtons (loginButtons)
+	 local regConf = native.showAlert( "Registration", "Registration for".. " " .. inputRegEmail.text.. " ".."Successful !", {"Ok"} , onRegister )
 	else
 	 regForm = true
 	 end
@@ -150,6 +151,18 @@ local function handleInput( event )
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   end
+end
+
+-- local function for button click
+
+local function onRegister(event)
+	if (event.action == "clicked") and regConf then
+		local i = event.index
+		if (i ==  1) then
+	
+		end
+	
+	end
 end
 
 -- handle searching for lawyer
