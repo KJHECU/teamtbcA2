@@ -748,7 +748,7 @@ loginButtons = {
     inputLoadEmail,
     backLoadPassword,
     txtLoadPassword,
-    inputLoadPassword,
+    inputLoadPassword
   }
 
 registrationButtons = {
