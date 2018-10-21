@@ -74,6 +74,7 @@ local function handleInput( event )
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
+	else if 
     end
 
   elseif id == 11 then
@@ -121,7 +122,7 @@ local function handleInput( event )
 	 hideButtons(registrationButtons)
 	 showButtons (loginButtons)
 	 local regConf = native.showAlert( "Registration", "Registration for".. " " .. inputRegEmail.text.. " ".."Successful !", {"Ok"} , onRegister )
-	else
+	 else
 	 regForm = true
 	 end
   elseif id == 13 then
@@ -184,6 +185,7 @@ function submitRegistration()
   db:exec(query)
 end
 
+-- function which handles login
 function loginAccepted()
   emptyField = false
   if isEmpty(inputLoadEmail) then
@@ -208,6 +210,7 @@ function loginAccepted()
   end
 end
 
+-- function which checks for empty input fields
 function isEmpty(field)
 	if field.text == "" then
 		return true
@@ -326,6 +329,8 @@ inputLoadPassword.isSecure = true
 inputLoadPassword.placeholder = "-- insert password --"
 --set font
 inputLoadPassword.font = native.newFont(native.systemFont, 12)
+
+errorPlaceholder = display.newText 
 
 ------- registration fields
 -- registration label
