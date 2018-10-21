@@ -604,13 +604,12 @@ end
 
 function addButtonToScroll(scroll, row, num)
   local testGroup = display.newGroup()
-  
   local profileCircle = display.newCircle (65, (num * 75) + 30, 15)
           profileCircle:setStrokeColor (1,0,0)
           profileCircle:setFillColor (0, 0.8, 0.8)
-    testGroup:insert(profileCircle)
- 
-  
+  testGroup:insert(profileCircle)
+  profileCircle:toFront()
+   
   button = widget.newButton(
     {
       id = scroll.id .. row.id,
@@ -631,7 +630,6 @@ function addButtonToScroll(scroll, row, num)
   )
   
   testGroup:insert(button)
-  button:toBack()
   scroll:insert(testGroup)
   table.insert(currentButtons, testGroup)
 end
