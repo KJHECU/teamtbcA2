@@ -17,6 +17,7 @@ local path = system.pathForFile( "data.db", system.ResourceDirectory )
 local db = sqlite3.open( path )  
 
 local currentCountryId = 1
+local currentCountry = "Australia"
 local userType = 0
 
 local loginForm = true
@@ -81,12 +82,8 @@ local function handleInput( event )
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
-
 	  loginError.isVisible = false
-	
-    end
-
-
+	 end
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
@@ -97,12 +94,28 @@ local function handleInput( event )
       showButtons (loginButtons)
       regConf = native.showAlert( "Registration", "Registration for " .. inputRegEmail.text .. " Successful!", {"Ok"}, onRegister )
     end
-
   elseif id == 13 then
 	  hideButtons(registrationButtons)
 	  showButtons(loginButtons)
+  elseif id == 14 then
+	  hideButtons(localLawyerButtons)
+	  hideButtons(menuBarButtons)
+	  hideButtons(currentButtons)
+	  lawyerScroll.isVisible = false
+	  showButtons(addLawyerButtons)
+	  print(currentCountry)
+  elseif id == 15 then
+	 addNewLawyer()
+	 
+  elseif id == 16 then
+    hideButtons(currentButtons)
+    populateScroll(lawyerScroll, nil)
+    lawyerScroll.isVisible = true
+    showButtons(localLawyerButtons)
+    showButtons(menuBarButtons)  
   elseif id == 99 then
     hideButtons(currentButtons)
+	lawyerScroll.isVisible = false
     populateScroll(countryScroll, nil)
     countryScroll.isVisible = true
     showButtons(countryButtons)
@@ -111,12 +124,16 @@ local function handleInput( event )
     currentCountryId = id:sub(8)
     for row in db:nrows([[SELECT name FROM country WHERE id=]] .. currentCountryId) do
       countrySelectButton:setLabel("Current Country: " .. row.name)
-    end
-    hideButtons(currentButtons)
+	  currentCountry = row.name
+	  txtaddLawyerCountry.text = "Current Country: "..currentCountry
+	  
+	end
+	hideButtons(currentButtons)
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   end
-end
+  print( currentCountry )
+  end
 
 -- local function for button click
 
@@ -195,9 +212,16 @@ function submitRegistration()
     .. inputRegEmail.text .. [[", "]] .. inputRegPassword.text .. [[", "]] .. inputFname.text .. " " .. inputSname.text 
     .. [[", "]] .. inputMobile.text .. [[", "]] .. inputKinEmail.text .. [[", "]] .. inputKinFname.text .. " " .. inputKinSname.text
     .. [[", "]] .. inputKinMobile.text .. [[");]]
+	
   db:exec(query)
 end
 
+function addNewLawyer()
+  query = [[INSERT INTO lawyer (email, name, mobilenum, countryid) VALUES ("]] 
+    .. inputaddLawyerEmail.text .. [[", "]] .. inputaddLawyerFname.text .. "" .. inputaddLawyerSname.text .. [[", "]] .. inputaddLawyerMobile.text .. [[", "]] .. currentCountryId ..[[");]]
+	print(query)
+  db:exec(query)
+end
 -- function which handles login
 function loginAccepted()
 
@@ -282,6 +306,16 @@ local function addButton( ID, x, y, width, height, btnType, label )
 		  fontSize = 13
         }
       )  
+	  
+  elseif btnType == "lawyerAdd" then
+    button = widget.newButton(
+        {
+          label = label,
+          shape = "Circle",
+		  radius = 15,
+
+        }
+      ) 
  else
     button = widget.newButton(
         {
@@ -314,6 +348,11 @@ panicSettingsButton = display.newImage("User-Profile.png")
   panicSettingsButton:scale(0.12, 0.12)
   panicSettingsButton.y = display.contentHeight + 10
   panicSettingsButton.x = 7.75*display.contentWidth/10
+  
+addLawyerButton = display.newImage("addButton.png")
+ addLawyerButton:scale(0.5,0.5)
+ addLawyerButton.y = display.contentHeight/5.5
+ addLawyerButton.x = display.contentWidth/1.125
   
 -- login feature which is enabled by default --
 
@@ -363,7 +402,7 @@ txtRegistration:setFillColor (1,1,1 )
 txtRegistration.x = display.contentWidth/1.25
 txtRegistration.y = display.contentHeight/12.5
 
--- email field
+-- registration email field
 backRegEmail = display.newRect(display.contentWidth/2, display.contentHeight/6.1, display.contentWidth, display.contentHeight/15)
 backRegEmail:setFillColor (0, 0.8, 0.8)
 inputRegEmail = native.newTextField(0,0,200,30)
@@ -371,15 +410,12 @@ txtRegEmail = display.newText( "Email",display.contentWidth/0.84, display.conten
 inputRegEmail.x = display.contentWidth/2.9
 inputRegEmail.y = display.contentHeight/6.2
 inputRegEmail:setTextColor(0,0,0)
---set input type
 inputRegEmail.inputType = "default"
---define the placeholder
 inputRegEmail.placeholder = "-- insert email--"
---set font
 inputRegEmail.font = native.newFont(native.systemFont, 12)
 native.setKeyboardFocus(inputEmail)
 
--- First Name
+-- registration First Name
 backFname = display.newRect(display.contentWidth/2, display.contentHeight/4.1, display.contentWidth, display.contentHeight/15)
 backFname:setFillColor (0, 0.8, 0.8)
 inputFname = native.newTextField(0,0,200,30)
@@ -387,14 +423,11 @@ txtFname = display.newText( "First Name", display.contentWidth/0.84, display.con
 inputFname.x = display.contentWidth/2.9
 inputFname.y = display.contentHeight/4.2
 inputFname:setTextColor(0,0,0) 
---set input type
 inputFname.inputType = "default"
---define the placeholder
 inputFname.placeholder = "-- insert first name --"
---set font
 inputFname.font = native.newFont(native.systemFont, 12)
 
--- Surname
+-- registration Surname
 backSname = display.newRect(display.contentWidth/2, display.contentHeight/3.1, display.contentWidth, display.contentHeight/15)
 backSname:setFillColor (0, 0.8, 0.8)
 inputSname = native.newTextField(0,0,200,30)
@@ -402,14 +435,11 @@ txtSname = display.newText( "Surname", display.contentWidth/0.84, display.conten
 inputSname.x = display.contentWidth/2.9
 inputSname.y = display.contentHeight/3.1
 inputSname:setTextColor(0,0,0) 
---set input type
 inputSname.inputType = "default"
---define the placeholder
 inputSname.placeholder = "-- insert first name --"
---set font
 inputSname.font = native.newFont(native.systemFont, 12)
 
--- Mobile No
+-- registration Mobile No
 backMobile = display.newRect(display.contentWidth/2, display.contentHeight/2.5, display.contentWidth, display.contentHeight/15)
 backMobile:setFillColor (0, 0.8, 0.8)
 inputMobile = native.newTextField(0,0,200,30)
@@ -417,14 +447,11 @@ txtMobile = display.newText( "Mobile no", display.contentWidth/0.84, display.con
 inputMobile.x = display.contentWidth/2.9
 inputMobile.y = display.contentHeight/2.5
 inputMobile:setTextColor(0,0,0) 
---set input type
 inputMobile.inputType = "default"
---define the placeholder
 inputMobile.placeholder = "-- insert first name --"
---set font
 inputMobile.font = native.newFont(native.systemFont, 12)
 
--- Password
+-- registration Password
 backRegPassword = display.newRect(display.contentWidth/2, display.contentHeight/2.1, display.contentWidth, display.contentHeight/15)
 backRegPassword:setFillColor (0, 0.8, 0.8)
 inputRegPassword = native.newTextField(0,0,200,30)
@@ -432,21 +459,17 @@ txtRegPassword = display.newText( "Password", display.contentWidth/0.84, display
 inputRegPassword.x = display.contentWidth/2.9
 inputRegPassword.y = display.contentHeight/2.1
 inputRegPassword:setTextColor(0,0,0) 
---set input type
 inputRegPassword.inputType = "default"
 inputRegPassword.isSecure = true
---define the placeholder
 inputRegPassword.placeholder = "-- insert password --"
---set font
 inputRegPassword.font = native.newFont(native.systemFont, 12)
 
-
--- Next of Kin label
+-- registration Next of Kin label
 backKin = display.newRect(display.contentWidth/2, display.contentHeight/1.775, display.contentWidth/1, display.contentHeight/15)
 backKin:setFillColor (0, 0.8, 0.8)
 txtKin = display.newText( "NEXT OF KIN", display.contentWidth/1.17, display.contentHeight/1.725, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
 
--- Next of Kin Email
+-- registration Next of Kin Email
 backKinEmail = display.newRect(display.contentWidth/2, display.contentHeight/1.57, display.contentWidth, display.contentHeight/15)
 backKinEmail:setFillColor (0, 0.8, 0.8)
 inputKinEmail = native.newTextField(0,0,200,30)
@@ -454,14 +477,11 @@ txtKinEmail = display.newText( "Email", display.contentWidth/0.84, display.conte
 inputKinEmail.x = display.contentWidth/2.9
 inputKinEmail.y = display.contentHeight/1.57
 inputKinEmail:setTextColor(0,0,0) 
---set input type
 inputKinEmail.inputType = "default"
---define the placeholder
 inputKinEmail.placeholder = "-- insert NOK first name --"
---set font
 inputKinEmail.font = native.newFont(native.systemFont, 12)
 
--- Next of Kin First Name
+-- registration Next of Kin First Name
 backKinFname = display.newRect(display.contentWidth/2, display.contentHeight/1.4, display.contentWidth, display.contentHeight/15)
 backKinFname:setFillColor (0, 0.8, 0.8)
 inputKinFname = native.newTextField(0,0,200,30)
@@ -469,14 +489,11 @@ txtKinFname = display.newText( "First Name", display.contentWidth/0.84, display.
 inputKinFname.x = display.contentWidth/2.9
 inputKinFname.y = display.contentHeight/1.4
 inputKinFname:setTextColor(0,0,0) 
---set input type
 inputKinFname.inputType = "default"
---define the placeholder
 inputKinFname.placeholder = "-- insert NOK first name --"
---set font
 inputKinFname.font = native.newFont(native.systemFont, 12)
 
--- Next of Kin SurnName
+-- registration Next of Kin SurnName
 backKinSname = display.newRect(display.contentWidth/2, display.contentHeight/1.27, display.contentWidth, display.contentHeight/15)
 backKinSname:setFillColor (0, 0.8, 0.8)
 inputKinSname = native.newTextField(0,0,200,30)
@@ -484,14 +501,11 @@ txtKinSname = display.newText( "Surname", display.contentWidth/0.84, display.con
 inputKinSname.x = display.contentWidth/2.9
 inputKinSname.y = display.contentHeight/1.27
 inputKinSname:setTextColor(0,0,0) 
---set input type
 inputKinSname.inputType = "default"
---define the placeholder
 inputKinSname.placeholder = "-- insert NOK Surname --"
---set font
 inputKinSname.font = native.newFont(native.systemFont, 12)
 
--- Next of Kin Mobile no
+-- registration Next of Kin Mobile no
 backKinMobile = display.newRect(display.contentWidth/2, display.contentHeight/1.16, display.contentWidth, display.contentHeight/15)
 backKinMobile:setFillColor (0, 0.8, 0.8)
 inputKinMobile = native.newTextField(0,0,200,30)
@@ -499,13 +513,74 @@ txtKinMobile = display.newText( "Mobile no", display.contentWidth/0.84, display.
 inputKinMobile.x = display.contentWidth/2.9
 inputKinMobile.y = display.contentHeight/1.16
 inputKinMobile:setTextColor(0,0,0) 
---set input type
 inputKinMobile.inputType = "default"
---define the placeholder
 inputKinMobile.placeholder = "-- insert NOK Mobile --"
---set font
 inputKinMobile.font = native.newFont(native.systemFont, 12)
 
+------- add local lawyer fields
+-- add Lawyer 
+backaddLawyer = display.newRect(display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15)
+backaddLawyer:setFillColor (0, 0.8, 0.8)
+txtaddLawyer = display.newText("ADD LAWYER", display.contentWidth/3.3, display.contentHeight/13.5, display.contentWidth, display.contentHeight/15, native.systemFont, 16)
+txtaddLawyer:setFillColor (1,1,1 )
+txtaddLawyer.x = display.contentWidth/1.25
+txtaddLawyer.y = display.contentHeight/12.5
+
+-- add Lawyer email field
+backaddLawyerEmail = display.newRect(display.contentWidth/2, display.contentHeight/6.1, display.contentWidth, display.contentHeight/15)
+backaddLawyerEmail:setFillColor (0, 0.8, 0.8)
+inputaddLawyerEmail = native.newTextField(0,0,200,30)
+txtaddLawyerEmail = display.newText( "Email",display.contentWidth/0.84, display.contentHeight/5.6, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+inputaddLawyerEmail.x = display.contentWidth/2.9
+inputaddLawyerEmail.y = display.contentHeight/6.2
+inputaddLawyerEmail:setTextColor(0,0,0)
+inputaddLawyerEmail.inputType = "default"
+inputaddLawyerEmail.placeholder = "-- insert email--"
+inputaddLawyerEmail.font = native.newFont(native.systemFont, 12)
+native.setKeyboardFocus(inputEmail)
+
+-- add Lawyer First Name
+backaddLawyerFname = display.newRect(display.contentWidth/2, display.contentHeight/4.1, display.contentWidth, display.contentHeight/15)
+backaddLawyerFname:setFillColor (0, 0.8, 0.8)
+inputaddLawyerFname = native.newTextField(0,0,200,30)
+txtaddLawyerFname = display.newText( "First Name", display.contentWidth/0.84, display.contentHeight/3.9, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+inputaddLawyerFname.x = display.contentWidth/2.9
+inputaddLawyerFname.y = display.contentHeight/4.05
+inputaddLawyerFname:setTextColor(0,0,0) 
+inputaddLawyerFname.inputType = "default"
+inputaddLawyerFname.placeholder = "-- insert first name --"
+inputaddLawyerFname.font = native.newFont(native.systemFont, 12)
+
+-- add Lawyer Surname
+backaddLawyerSname = display.newRect(display.contentWidth/2, display.contentHeight/3.1, display.contentWidth, display.contentHeight/15)
+backaddLawyerSname:setFillColor (0, 0.8, 0.8)
+inputaddLawyerSname = native.newTextField(0,0,200,30)
+txtaddLawyerSname = display.newText( "Surname", display.contentWidth/0.84, display.contentHeight/3, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+inputaddLawyerSname.x = display.contentWidth/2.9
+inputaddLawyerSname.y = display.contentHeight/3.1
+inputaddLawyerSname:setTextColor(0,0,0) 
+inputaddLawyerSname.inputType = "default"
+inputaddLawyerSname.placeholder = "-- insert surname --"
+inputaddLawyerSname.font = native.newFont(native.systemFont, 12)
+
+-- add Lawyer Mobile No
+backaddLawyerMobile = display.newRect(display.contentWidth/2, display.contentHeight/2.5, display.contentWidth, display.contentHeight/15)
+backaddLawyerMobile:setFillColor (0, 0.8, 0.8)
+inputaddLawyerMobile = native.newTextField(0,0,200,30)
+txtaddLawyerMobile = display.newText( "Mobile no", display.contentWidth/0.84, display.contentHeight/2.425, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+inputaddLawyerMobile.x = display.contentWidth/2.9
+inputaddLawyerMobile.y = display.contentHeight/2.5
+inputaddLawyerMobile:setTextColor(0,0,0) 
+inputaddLawyerMobile.inputType = "default"
+inputaddLawyerMobile.placeholder = "-- insert mobile --"
+inputaddLawyerMobile.font = native.newFont(native.systemFont, 12)
+
+-- add Lawyer Country
+backaddLawyerCountry= display.newRect(display.contentWidth/2, display.contentHeight/2.1, display.contentWidth, display.contentHeight/15)
+backaddLawyerCountry:setFillColor (0, 0.8, 0.8)
+txtaddLawyerCountry = display.newText("Current Country: "..currentCountry, display.contentWidth/1.4, display.contentHeight/2.05, display.contentWidth, display.contentHeight/15)
+txtaddLawyerCountry:setTextColor(1,1,1) 
+txtaddLawyerCountry.font = native.newFont(native.systemFont, 12)
 
 -- scroll pane for local lawyer & country lists
 
@@ -530,10 +605,11 @@ end
 function addButtonToScroll(scroll, row, num)
   local testGroup = display.newGroup()
   
-  local profileCircle = display.newCircle (70, 30, 15)
-  
-  profileCircle:setStrokeColor (255, 0, 0)
-  testGroup:insert(profileCircle)
+  local profileCircle = display.newCircle (65, (num * 75) + 30, 15)
+          profileCircle:setStrokeColor (1,0,0)
+          profileCircle:setFillColor (0, 0.8, 0.8)
+    testGroup:insert(profileCircle)
+ 
   
   button = widget.newButton(
     {
@@ -561,7 +637,7 @@ function addButtonToScroll(scroll, row, num)
 end
 
 lawyerScroll = getScroll( "lawyer" )
-lawyerSearch = native.newTextField(display.contentWidth/2,display.contentHeight/5.5,0.9*display.contentWidth,26)
+lawyerSearch = native.newTextField(display.contentWidth/2,display.contentHeight/5.5,0.5*display.contentWidth,26)
 lawyerSearch.placeholder = "Search Lawyer"
 lawyerSearch.id = "lawyerId"
 lawyerSearch:addEventListener("userInput", searchListenerLaw)
@@ -788,9 +864,33 @@ registrationButtons = {
 }
 
 localLawyerButtons = {
+	addButton( 14, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "icon", addLawyerButton),
   countryGroup,
   lawyerScroll,
-  lawyerSearch
+  lawyerSearch,
+  addLawyerButton
+  
+}
+
+addLawyerButtons = {
+	addButton( 15, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
+    addButton( 16, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
+    backaddLawyer,
+	txtaddLawyer,
+    backaddLawyerEmail,
+	inputaddLawyerEmail,
+	txtaddLawyerEmail,
+	backaddLawyerFname,
+	inputaddLawyerFname,
+	txtaddLawyerFname,
+	backaddLawyerSname,
+	inputaddLawyerSname,
+	txtaddLawyerSname,
+	backaddLawyerMobile,
+	inputaddLawyerMobile,
+	txtaddLawyerMobile,
+	backaddLawyerCountry,
+	txtaddLawyerCountry,
 }
 
 countryButtons = {
@@ -824,6 +924,7 @@ function hideButtons(buttons)
     currentButtons = {}
 end
 
+hideButtons(addLawyerButtons)
 hideButtons(phraseButtons)
 hideButtons(countryButtons)
 hideButtons(phraseMenuButtons)
