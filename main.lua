@@ -74,65 +74,20 @@ local function handleInput( event )
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
+	  loginError.isVisible = false
 	
     end
   elseif id == 11 then
 	  hideButtons(loginButtons)
 	  showButtons(registrationButtons)
   elseif id == 12 then
-<<<<<<< HEAD
-   if isEmpty(inputRegEmail) then
-     inputRegEmail.placeholder = "Email not provided"
-	 regForm = false
-	 end
-   if isEmpty(inputFname) then
-     inputFname.placeholder = "First Name not provided"
-	 regForm = false
-	 end
-	if isEmpty(inputSname) then
-     inputSname.placeholder = "Surname not provided"
-	 regForm = false
-	 end
-	if isEmpty(inputMobile) then
-     inputMobile.placeholder = "Mobile not provided"
-	 regForm = false
-	 end
-	if isEmpty(inputRegPassword) then
-     inputRegPassword.placeholder = "Password not provided"
-	 regForm = false
-	 end
-	if isEmpty(inputKinEmail) then
-     inputKinEmail.placeholder = "Email not provided"
-	 regForm = false
-	 end 
-	if isEmpty(inputKinFname) then
-     inputKinFname.placeholder = "First Name not provided"
-	 regForm = false
-	 end 
-	if isEmpty(inputKinSname) then
-     inputKinSname.placeholder = "Surname not provided"
-	 regForm = false
-	 end
-    if isEmpty(inputKinMobile) then
-     inputKinMobile.placeholder = "Mobile not provided"
-	 regForm = false
-	 end 	 
-    if regForm then 
-	 submitRegistration() 
-	 hideButtons(registrationButtons)
-	 showButtons (loginButtons)
-	 local regConf = native.showAlert( "Registration", "Registration for".. " " .. inputRegEmail.text.. " ".."Successful !", {"Ok"} , onRegister )
-	 else
-	 regForm = true
-	 end
-=======
     if regFormValid() then 
       submitRegistration() 
       hideButtons(registrationButtons)
       showButtons (loginButtons)
       regConf = native.showAlert( "Registration", "Registration for " .. inputRegEmail.text .. " Successful!", {"Ok"}, onRegister )
     end
->>>>>>> master
+
   elseif id == 13 then
 	  hideButtons(registrationButtons)
 	  showButtons(loginButtons)
@@ -249,13 +204,16 @@ function loginAccepted()
   end
   query = [[SELECT * FROM user WHERE email="]] .. inputLoadEmail.text .. [["]]
   for row in db:nrows(query) do
-    if row.password == inputLoadPassword.text then
-      userType = row.usertype
-      print("User type = " .. userType)
-      return true
-    end
-    return false
-  end
+	if row.password == inputLoadPassword.text then
+		  userType = row.usertype
+		  print("User type = " .. userType)
+		  return true
+		end
+	loginError.isVisible = true
+	return false
+   end
+	loginError.isVisible = true
+	return false
 end
 
 -- function which checks for empty input fields
@@ -378,7 +336,9 @@ inputLoadPassword.placeholder = "-- insert password --"
 --set font
 inputLoadPassword.font = native.newFont(native.systemFont, 12)
 
-errorPlaceholder = display.newText 
+loginError = display.newText( "Login Failed", display.contentWidth/1.175, display.contentHeight/8.5, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+loginError:setFillColor (255,0,0)
+loginError.isVisible = false
 
 ------- registration fields
 -- registration label
