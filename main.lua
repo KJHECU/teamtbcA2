@@ -68,7 +68,12 @@ local function handleInput( event )
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
   elseif id == 10 then
-    if loginAccepted() then
+	if isEmpty(inputLoadEmail) then
+	  inputLoadEmail.placeholder = "Email not provided"
+	end
+	if isEmpty(inputLoadPassword) then
+	  inputLoadPassword.placeholder = "Password not provided"
+	elseif loginAccepted() then
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
@@ -136,6 +141,14 @@ function loginAccepted()
     end
     return false
   end
+end
+
+function isEmpty(field)
+	if field.text == "" then
+		return true
+	else
+		return false
+	end
 end
 
 -- utility to make buttons
