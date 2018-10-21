@@ -211,16 +211,6 @@ function loginAccepted()
     emptyField = true
 	end
   if emptyField then
-
-  query = [[SELECT * FROM user WHERE email="]] .. inputLoadEmail.text .. [["]]
-  for row in db:nrows(query) do
-    if row.password == inputLoadPassword.text then
-      userType = row.usertype
-      currentUserId = row.userid
-      print("User type = " .. userType)
-      return true
-    end
-
     return false
   end
   query = [[SELECT * FROM user WHERE email="]] .. inputLoadEmail.text .. [["]]
