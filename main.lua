@@ -74,6 +74,8 @@ local function handleInput( event )
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
+	  loginError.isVisible = false
+	
     end
   elseif id == 11 then
 	  hideButtons(loginButtons)
@@ -85,6 +87,7 @@ local function handleInput( event )
       showButtons (loginButtons)
       regConf = native.showAlert( "Registration", "Registration for " .. inputRegEmail.text .. " Successful!", {"Ok"}, onRegister )
     end
+
   elseif id == 13 then
 	  hideButtons(registrationButtons)
 	  showButtons(loginButtons)
@@ -185,6 +188,7 @@ function submitRegistration()
   db:exec(query)
 end
 
+-- function which handles login
 function loginAccepted()
   emptyField = false
   if isEmpty(inputLoadEmail) then
@@ -200,15 +204,19 @@ function loginAccepted()
   end
   query = [[SELECT * FROM user WHERE email="]] .. inputLoadEmail.text .. [["]]
   for row in db:nrows(query) do
-    if row.password == inputLoadPassword.text then
-      userType = row.usertype
-      print("User type = " .. userType)
-      return true
-    end
-    return false
-  end
+	if row.password == inputLoadPassword.text then
+		  userType = row.usertype
+		  print("User type = " .. userType)
+		  return true
+		end
+	loginError.isVisible = true
+	return false
+   end
+	loginError.isVisible = true
+	return false
 end
 
+-- function which checks for empty input fields
 function isEmpty(field)
 	if field.text == "" then
 		return true
@@ -327,6 +335,10 @@ inputLoadPassword.isSecure = true
 inputLoadPassword.placeholder = "-- insert password --"
 --set font
 inputLoadPassword.font = native.newFont(native.systemFont, 12)
+
+loginError = display.newText( "Login Failed", display.contentWidth/1.175, display.contentHeight/8.5, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+loginError:setFillColor (255,0,0)
+loginError.isVisible = false
 
 ------- registration fields
 -- registration label
