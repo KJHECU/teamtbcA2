@@ -357,7 +357,6 @@ addLawyerButton = display.newImage("addButton.png")
 -- login feature which is enabled by default --
 
 -- login username capture
-
 backLoadEmail = display.newRect(display.contentWidth/2, display.contentHeight/6.65, display.contentWidth, display.contentHeight/15)
 backLoadEmail:setFillColor (0, 0.8, 0.8)
 inputLoadEmail = native.newTextField(0,0,200,30)
@@ -365,7 +364,6 @@ txtLoadEmail = display.newText( "Email",display.contentWidth/0.8, display.conten
 inputLoadEmail.x = display.contentWidth/2.9
 inputLoadEmail.y = display.contentHeight/6.6
 inputLoadEmail:setTextColor(0,0,0)
---set input type
 inputLoadEmail.inputType = "default"
 inputLoadEmail.placeholder = "-- insert email--"
 inputLoadEmail.font = native.newFont(native.systemFont, 12)
@@ -383,7 +381,6 @@ inputLoadPassword.inputType = "default"
 inputLoadPassword.isSecure = true
 inputLoadPassword.placeholder = "-- insert password --"
 inputLoadPassword.font = native.newFont(native.systemFont, 12)
-
 loginError = display.newText( "Invalid Email and/or Password", display.contentWidth/1.5, display.contentHeight/8.5, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
 loginError:setFillColor (255,0,0)
 loginError.isVisible = false
