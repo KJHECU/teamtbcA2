@@ -849,7 +849,7 @@ localLawyerButtons = {
   lawyerScroll,
   lawyerSearch,
   addLawyerButton
-
+  
 }
 
 addLawyerButtons = {
