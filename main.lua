@@ -356,7 +356,7 @@ addLawyerButton = display.newImage("addButton.png")
 
 -- login feature which is enabled by default --
 
--- username capture
+-- login username capture
 
 backLoadEmail = display.newRect(display.contentWidth/2, display.contentHeight/6.65, display.contentWidth, display.contentHeight/15)
 backLoadEmail:setFillColor (0, 0.8, 0.8)
@@ -367,13 +367,11 @@ inputLoadEmail.y = display.contentHeight/6.6
 inputLoadEmail:setTextColor(0,0,0)
 --set input type
 inputLoadEmail.inputType = "default"
---define the placeholder
 inputLoadEmail.placeholder = "-- insert email--"
---set font
 inputLoadEmail.font = native.newFont(native.systemFont, 12)
 native.setKeyboardFocus(inputLoadEmail)
 
--- password capture
+-- login password capture
 backLoadPassword = display.newRect(display.contentWidth/2, display.contentHeight/4.2, display.contentWidth, display.contentHeight/15)
 backLoadPassword:setFillColor (0, 0.8, 0.8)
 inputLoadPassword = native.newTextField(0,0,200,30)
@@ -381,12 +379,9 @@ txtLoadPassword = display.newText( "Password", display.contentWidth/0.83, displa
 inputLoadPassword.x = display.contentWidth/2.9
 inputLoadPassword.y = display.contentHeight/4.2
 inputLoadPassword:setTextColor(0,0,0)
---set input type
 inputLoadPassword.inputType = "default"
 inputLoadPassword.isSecure = true
---define the placeholder
 inputLoadPassword.placeholder = "-- insert password --"
---set font
 inputLoadPassword.font = native.newFont(native.systemFont, 12)
 
 loginError = display.newText( "Invalid Email and/or Password", display.contentWidth/1.5, display.contentHeight/8.5, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
