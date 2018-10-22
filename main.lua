@@ -595,7 +595,6 @@ function getScroll( scrollType )
 end
 
 function addButtonToScroll(scroll, row, num)
- 
   button = widget.newButton(
     {
       id = scroll.id .. row.id,
@@ -611,10 +610,8 @@ function addButtonToScroll(scroll, row, num)
       y = (num * 75) + 30,
 	  fontSize = 14,
       onRelease = handleInput,
-
     }
   )
- 
   scroll:insert(button)
   table.insert(currentButtons, button)
 end
