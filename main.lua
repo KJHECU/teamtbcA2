@@ -365,7 +365,7 @@ inputLoadEmail.x = display.contentWidth/2.9
 inputLoadEmail.y = display.contentHeight/6.6
 inputLoadEmail:setTextColor(0,0,0)
 inputLoadEmail.inputType = "default"
-inputLoadEmail.placeholder = "-- insert email--"
+inputLoadEmail.placeholder = "-- enter email--"
 inputLoadEmail.font = native.newFont(native.systemFont, 12)
 native.setKeyboardFocus(inputLoadEmail)
 
@@ -379,7 +379,7 @@ inputLoadPassword.y = display.contentHeight/4.2
 inputLoadPassword:setTextColor(0,0,0)
 inputLoadPassword.inputType = "default"
 inputLoadPassword.isSecure = true
-inputLoadPassword.placeholder = "-- insert password --"
+inputLoadPassword.placeholder = "-- enter password --"
 inputLoadPassword.font = native.newFont(native.systemFont, 12)
 loginError = display.newText( "Invalid Email and/or Password", display.contentWidth/1.5, display.contentHeight/8.5, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
 loginError:setFillColor (255,0,0)
@@ -595,13 +595,7 @@ function getScroll( scrollType )
 end
 
 function addButtonToScroll(scroll, row, num)
-  local testGroup = display.newGroup()
-  local profileCircle = display.newCircle (65, (num * 75) + 30, 20)
-
-  profileCircle:setFillColor (0, 0, 0)
-  testGroup:insert(profileCircle)
-
-
+ 
   button = widget.newButton(
     {
       id = scroll.id .. row.id,
@@ -620,11 +614,9 @@ function addButtonToScroll(scroll, row, num)
 
     }
   )
-
-  button:toBack()
-  testGroup:insert(button)
-  scroll:insert(testGroup)
-  table.insert(currentButtons, testGroup)
+ 
+  scroll:insert(button)
+  table.insert(currentButtons, button)
 end
 
 lawyerScroll = getScroll( "lawyer" )
