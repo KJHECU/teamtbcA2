@@ -22,7 +22,7 @@ local userType = 0
 
 local loginForm = true
 local regForm = true
-
+local addLawyerForm = true
 
 -- List for placing currently active buttons for easier hiding
 currentButtons = {}
@@ -54,6 +54,11 @@ local function handleInput( event )
     lawyerScroll.isVisible = true
     showButtons(localLawyerButtons)
     showButtons(menuBarButtons)
+		if userType == 1 then
+		 addLawyerButton.isVisible = true
+		else
+		 addLawyerButton.isVisible = false
+		end
   elseif id == 5 then
     hideButtons(mainMenuButtons)
     showButtons(phraseMenuButtons)
@@ -98,15 +103,14 @@ local function handleInput( event )
 	  hideButtons(registrationButtons)
 	  showButtons(loginButtons)
   elseif id == 14 then
-	  hideButtons(localLawyerButtons)
-	  hideButtons(menuBarButtons)
 	  hideButtons(currentButtons)
-	  lawyerScroll.isVisible = false
 	  showButtons(addLawyerButtons)
-	  print(currentCountry)
   elseif id == 15 then
+  if addLawyerValid() then
 	 addNewLawyer()
-
+	 showButtons(localLawyerButtons)
+	 hideButtons(currentButtons)
+  end
   elseif id == 16 then
     hideButtons(currentButtons)
     populateScroll(lawyerScroll, nil)
@@ -126,14 +130,12 @@ local function handleInput( event )
       countrySelectButton:setLabel("Current Country: " .. row.name)
 	  currentCountry = row.name
 	  txtaddLawyerCountry.text = "Current Country: "..currentCountry
-
 	end
 	hideButtons(currentButtons)
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   end
-  print( currentCountry )
-  end
+end
 
 -- local function for button click
 
@@ -207,6 +209,28 @@ function regFormValid()
   return regForm
 end
 
+function addLawyerValid()
+  addLawyerForm = true
+  if isEmpty(inputaddLawyerEmail) then
+    inputaddLawyerEmail.placeholder = "Email not provided"
+    addLawyerForm = false
+  end
+  if isEmpty(inputaddLawyerFname) then
+    inputaddLawyerFname.placeholder = "First Name not provided"
+    addLawyerForm = false
+  end
+	if isEmpty(inputaddLawyerSname) then
+    inputaddLawyerSname.placeholder = "Surname not provided"
+    addLawyerForm = false
+  end
+	if isEmpty(inputaddLawyerMobile) then
+    inputaddLawyerMobile.placeholder = "Mobile not provided"
+    addLawyerForm = false
+  end
+  return addLawyerForm
+end
+
+-- function which handles the registration of new users
 function submitRegistration()
   query = [[INSERT INTO user (email, password, name, mobilenum, nokemail, nokname, nokmobile) VALUES ("]]
     .. inputRegEmail.text .. [[", "]] .. inputRegPassword.text .. [[", "]] .. inputFname.text .. " " .. inputSname.text
@@ -216,15 +240,15 @@ function submitRegistration()
   db:exec(query)
 end
 
+-- function which handles the addition of new laywers
 function addNewLawyer()
   query = [[INSERT INTO lawyer (email, name, mobilenum, countryid) VALUES ("]]
-    .. inputaddLawyerEmail.text .. [[", "]] .. inputaddLawyerFname.text .. "" .. inputaddLawyerSname.text .. [[", "]] .. inputaddLawyerMobile.text .. [[", "]] .. currentCountryId ..[[");]]
-	print(query)
+    .. inputaddLawyerEmail.text .. [[", "]] .. inputaddLawyerFname.text .. " " .. inputaddLawyerSname.text .. [[", "]] .. inputaddLawyerMobile.text .. [[", "]] .. currentCountryId ..[[");]]
   db:exec(query)
 end
+
 -- function which handles login
 function loginAccepted()
-
   emptyField = false
   if isEmpty(inputLoadEmail) then
 	  inputLoadEmail.placeholder = "Email not provided"
@@ -310,12 +334,15 @@ local function addButton( ID, x, y, width, height, btnType, label )
   elseif btnType == "lawyerAdd" then
     button = widget.newButton(
         {
-          label = label,
-          shape = "Circle",
-		  radius = 15,
-
-        }
+          default = label,
+          onRelease = handleInput,
+          width = width,
+          height = height,
+		}
+	
       )
+    	
+
  else
     button = widget.newButton(
         {
@@ -353,6 +380,8 @@ addLawyerButton = display.newImage("addButton.png")
  addLawyerButton:scale(0.5,0.5)
  addLawyerButton.y = display.contentHeight/5.5
  addLawyerButton.x = display.contentWidth/1.125
+ addLawyerButton.isVisible = false
+ 
 
 -- login feature which is enabled by default --
 
@@ -844,11 +873,12 @@ registrationButtons = {
 }
 
 localLawyerButtons = {
-	addButton( 14, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "icon", addLawyerButton),
-  countryGroup,
-  lawyerScroll,
-  lawyerSearch,
-  addLawyerButton
+  addButton( 14, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "lawyerAdd", addLawyerButton),
+	  countryGroup,
+	  lawyerScroll,
+	  lawyerSearch,
+	  addLawyerButton
+	  
   
 }
 
