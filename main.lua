@@ -104,14 +104,16 @@ local function handleInput( event )
 	  hideButtons(registrationButtons)
 	  showButtons(loginButtons)
   elseif id == 14 then
-	  hideButtons(currentButtons)
-	  showButtons(addLawyerButtons)
+    if userType == 1 then
+      hideButtons(currentButtons)
+      showButtons(addLawyerButtons)
+    end
   elseif id == 15 then
-  if addLawyerValid() then
-	 addNewLawyer()
-	 showButtons(localLawyerButtons)
-	 hideButtons(currentButtons)
-  end
+    if addLawyerValid() then
+     addNewLawyer()
+     showButtons(localLawyerButtons)
+     hideButtons(currentButtons)
+    end
   elseif id == 16 then
     hideButtons(currentButtons)
     populateScroll(lawyerScroll, nil)
