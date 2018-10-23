@@ -52,6 +52,7 @@ local function handleInput( event )
     hideButtons(currentButtons)
     populateScroll(lawyerScroll, nil)
     lawyerScroll.isVisible = true
+    lawyerScroll:toFront()
     showButtons(localLawyerButtons)
     showButtons(menuBarButtons)
 		if userType == 1 then
@@ -87,7 +88,7 @@ local function handleInput( event )
       hideButtons(loginButtons)
       showButtons(mainMenuButtons)
       showButtons(menuBarButtons)
-	  loginError.isVisible = false
+      loginError.isVisible = false
 	 end
   elseif id == 11 then
 	  hideButtons(loginButtons)
@@ -119,19 +120,19 @@ local function handleInput( event )
     showButtons(menuBarButtons)
   elseif id == 99 then
     hideButtons(currentButtons)
-	lawyerScroll.isVisible = false
     populateScroll(countryScroll, nil)
     countryScroll.isVisible = true
+    countryScroll:toFront()
     showButtons(countryButtons)
     showButtons(menuBarButtons)
   elseif string.starts(id,"country") then
     currentCountryId = id:sub(8)
     for row in db:nrows([[SELECT name FROM country WHERE id=]] .. currentCountryId) do
       countrySelectButton:setLabel("Current Country: " .. row.name)
-	  currentCountry = row.name
-	  txtaddLawyerCountry.text = "Current Country: "..currentCountry
-	end
-	hideButtons(currentButtons)
+      currentCountry = row.name
+      txtaddLawyerCountry.text = "Current Country: "..currentCountry
+    end
+    hideButtons(currentButtons)
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   end
@@ -236,7 +237,6 @@ function submitRegistration()
     .. inputRegEmail.text .. [[", "]] .. inputRegPassword.text .. [[", "]] .. inputFname.text .. " " .. inputSname.text
     .. [[", "]] .. inputMobile.text .. [[", "]] .. inputKinEmail.text .. [[", "]] .. inputKinFname.text .. " " .. inputKinSname.text
     .. [[", "]] .. inputKinMobile.text .. [[");]]
-
   db:exec(query)
 end
 
@@ -265,7 +265,7 @@ function loginAccepted()
   for row in db:nrows(query) do
 	if row.password == inputLoadPassword.text then
 		  userType = row.usertype
-		  print("User type = " .. userType)
+      currentUserId = row.userid
 		  return true
 		end
 	loginError.isVisible = true
@@ -330,7 +330,6 @@ local function addButton( ID, x, y, width, height, btnType, label )
 		  fontSize = 13
         }
       )
-
   elseif btnType == "lawyerAdd" then
     button = widget.newButton(
         {
@@ -339,10 +338,7 @@ local function addButton( ID, x, y, width, height, btnType, label )
           width = width,
           height = height,
 		}
-	
       )
-    	
-
  else
     button = widget.newButton(
         {
@@ -637,8 +633,8 @@ function addButtonToScroll(scroll, row, num)
       width = 350,
       x = display.contentWidth/2,
       y = (num * 75) + 30,
-	  fontSize = 14,
-      onRelease = handleInput,
+      fontSize = 14,
+      onRelease = handleInput
     }
   )
   scroll:insert(button)
@@ -705,7 +701,6 @@ function populateContacts ( scroll )
   for row in db:nrows(query) do
     addContactsToScroll(scroll, "Emergency", row.emergency, 0)
   end
-
   query = [[SELECT * FROM country WHERE id=]] .. currentCountryId
   for row in db:nrows(query) do
     addContactsToScroll(scroll, "Embassy", row.embassy, 1)
@@ -873,21 +868,19 @@ registrationButtons = {
 }
 
 localLawyerButtons = {
-  addButton( 14, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "lawyerAdd", addLawyerButton),
+    addLawyerButton,
+    addButton( 14, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "lawyerAdd", addLawyerButton),
 	  countryGroup,
 	  lawyerScroll,
-	  lawyerSearch,
-	  addLawyerButton
-	  
-  
+	  lawyerSearch
 }
 
 addLawyerButtons = {
 	addButton( 15, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
-    addButton( 16, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
-    backaddLawyer,
+  addButton( 16, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
+  backaddLawyer,
 	txtaddLawyer,
-    backaddLawyerEmail,
+  backaddLawyerEmail,
 	inputaddLawyerEmail,
 	txtaddLawyerEmail,
 	backaddLawyerFname,
