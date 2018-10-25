@@ -43,7 +43,7 @@ local buttonStrokeFillColor = { default={0,0.8,0.8}, over={0.8,0.8,1,1} }
 local function handleInput( event )
   id = event.target.id
   print("button push " .. id)
-  if id == 2 then
+  if id == 2 then 					
     hideButtons(currentButtons)
     hideButtons(phraseButtons)
     showButtons(mainMenuButtons)
@@ -76,6 +76,11 @@ local function handleInput( event )
     phraseScroll.isVisible = true
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
+	if userType == 1 then
+		 addPhraseButton.isVisible = true
+		else
+		 addPhraseButton.isVisible = false
+		end
   elseif id == 8 then
     hideButtons(phraseMenuButtons)
     phraseText.text = "Legal Phrases"
@@ -83,6 +88,11 @@ local function handleInput( event )
     phraseScroll.isVisible = true
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
+	if userType == 1 then
+		 addPhraseButton.isVisible = true
+		else
+		 addPhraseButton.isVisible = false
+		end
   elseif id == 10 then
     if loginAccepted() then
       hideButtons(loginButtons)
@@ -120,6 +130,16 @@ local function handleInput( event )
     lawyerScroll.isVisible = true
     showButtons(localLawyerButtons)
     showButtons(menuBarButtons)
+  elseif id == 17 then
+  if userType == 1 then
+    hideButtons(currentButtons)
+    showButtons(addPhraseButtons)
+  end     
+  elseif id == 19 then
+    hideButtons(currentButtons)
+    showButtons(phraseMenuButtons)
+	showButtons(menuBarButtons)
+    
   elseif id == 99 then
     hideButtons(currentButtons)
     populateScroll(countryScroll, nil)
@@ -341,6 +361,15 @@ local function addButton( ID, x, y, width, height, btnType, label )
           height = height,
 		}
       )
+  elseif btnType == "phraseAdd" then
+    button = widget.newButton(
+        {
+          default = label,
+          onRelease = handleInput,
+          width = width,
+          height = height,
+		}
+      )
  else
     button = widget.newButton(
         {
@@ -379,6 +408,12 @@ addLawyerButton = display.newImage("addButton.png")
  addLawyerButton.y = display.contentHeight/5.5
  addLawyerButton.x = display.contentWidth/1.125
  addLawyerButton.isVisible = false
+ 
+addPhraseButton = display.newImage("addButton.png")
+ addPhraseButton:scale(0.5,0.5)
+ addPhraseButton.y = display.contentHeight/5.8
+ addPhraseButton.x = display.contentWidth/1.125
+ addPhraseButton.isVisible = false
  
 
 -- login feature which is enabled by default --
@@ -594,12 +629,47 @@ inputaddLawyerMobile.inputType = "default"
 inputaddLawyerMobile.placeholder = "-- insert mobile --"
 inputaddLawyerMobile.font = native.newFont(native.systemFont, 12)
 
--- add Lawyer Country
-backaddLawyerCountry= display.newRect(display.contentWidth/2, display.contentHeight/2.1, display.contentWidth, display.contentHeight/15)
-backaddLawyerCountry:setFillColor (0, 0.8, 0.8)
-txtaddLawyerCountry = display.newText("Current Country: "..currentCountry, display.contentWidth/1.4, display.contentHeight/2.05, display.contentWidth, display.contentHeight/15)
-txtaddLawyerCountry:setTextColor(1,1,1)
-txtaddLawyerCountry.font = native.newFont(native.systemFont, 12)
+------- add phrase fields
+
+-- add Phrase heading
+backaddPhrase = display.newRect(display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15)
+backaddPhrase:setFillColor (0, 0.8, 0.8)
+txtaddPhrase= display.newText("ADD PHRASE", display.contentWidth/3.3, display.contentHeight/13.5, display.contentWidth, display.contentHeight/15, native.systemFont, 16)
+txtaddPhrase:setFillColor (1,1,1 )
+txtaddPhrase.x = display.contentWidth/1.25
+txtaddPhrase.y = display.contentHeight/12.5
+
+-- add Phrase Primary
+backaddPhrasePrimary = display.newRect(display.contentWidth/2, display.contentHeight/6.1, display.contentWidth, display.contentHeight/15)
+backaddPhrasePrimary :setFillColor (0, 0.8, 0.8)
+inputaddPhrasePrimary  = native.newTextField(0,0,200,30)
+txtaddPhrasePrimary  = display.newText( "Phrase",display.contentWidth/0.84, display.contentHeight/5.6, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+inputaddPhrasePrimary.x = display.contentWidth/2.9
+inputaddPhrasePrimary.y = display.contentHeight/6.2
+inputaddPhrasePrimary:setTextColor(0,0,0)
+inputaddPhrasePrimary.inputType = "default"
+inputaddPhrasePrimary.placeholder = "-- insert phrase--"
+inputaddPhrasePrimary.font = native.newFont(native.systemFont, 12)
+native.setKeyboardFocus(inputEmail)
+
+-- add Phrase Translation
+backaddPhraseTrans = display.newRect(display.contentWidth/2, display.contentHeight/4.1, display.contentWidth, display.contentHeight/15)
+backaddPhraseTrans:setFillColor (0, 0.8, 0.8)
+inputaddPhraseTrans = native.newTextField(0,0,200,30)
+txtaddPhraseTrans = display.newText( "Translation", display.contentWidth/0.84, display.contentHeight/3.9, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+inputaddPhraseTrans.x = display.contentWidth/2.9
+inputaddPhraseTrans.y = display.contentHeight/4.05
+inputaddPhraseTrans:setTextColor(0,0,0)
+inputaddPhraseTrans.inputType = "default"
+inputaddPhraseTrans.placeholder = "-- insert phrase translation --"
+inputaddPhraseTrans.font = native.newFont(native.systemFont, 12)
+
+-- static Country 
+backstaticCountry= display.newRect(display.contentWidth/2, display.contentHeight/2.1, display.contentWidth, display.contentHeight/15)
+backstaticCountry:setFillColor (0, 0.8, 0.8)
+txtstaticCountry = display.newText("Current Country: "..currentCountry, display.contentWidth/1.4, display.contentHeight/2.05, display.contentWidth, display.contentHeight/15)
+txtstaticCountry:setTextColor(1,1,1)
+txtstaticCountry.font = native.newFont(native.systemFont, 12)
 
 -- scroll pane for local lawyer & country lists
 
@@ -635,7 +705,7 @@ function addButtonToScroll(scroll, row, num)
       width = 350,
       x = display.contentWidth/2,
       y = (num * 75) + 30,
-      fontSize = 14,
+      fontSize = 16,
       onRelease = handleInput
     }
   )
@@ -722,7 +792,8 @@ function addPhraseToScroll(scroll, row, num)
       height = display.contentHeight/8.4,
       width = display.contentWidth - 30,
       x = display.contentWidth/2,
-      y = (num * 60) + 30
+      y = (num * 60) + 30,
+	  fontSize = 14
     }
   )
   button2 = display.newText(
@@ -778,11 +849,15 @@ phraseText = display.newText(
     x = display.contentWidth / 2,
     y = 80,
     width = display.contentWidth / 2,
-    fontSize = 20,
+    fontSize = 16,
     align = "center"
   }
 )
 phraseText:setFillColor( 1, 1, 1 )
+
+local phrasesGroup = display.newGroup()
+phrasesGroup:insert(phraseText)
+phrasesGroup:insert(addPhraseButton)
 
 -- Current Country display group (inc button)
 
@@ -894,8 +969,9 @@ addLawyerButtons = {
 	backaddLawyerMobile,
 	inputaddLawyerMobile,
 	txtaddLawyerMobile,
-	backaddLawyerCountry,
-	txtaddLawyerCountry,
+	backstaticCountry,
+	txtstaticCountry,
+	
 }
 
 countryButtons = {
@@ -909,10 +985,29 @@ contactsButtons = {
 }
 
 phraseButtons = {
-  countryGroup,
-  phraseScroll,
-  phraseText,
-  phraseRectangle
+    addButton( 17, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "phraseAdd", addPhraseButton),
+	countryGroup,
+	phraseScroll,
+	phraseText,
+	phraseRectangle,
+	addPhraseButton,
+	
+}
+
+addPhraseButtons = {
+	addButton( 18, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
+    addButton( 19, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
+	backaddPhrase,
+	txtaddPhrase,
+	backaddPhrasePrimary,
+	txtaddPhrasePrimary,
+	inputaddPhrasePrimary,
+	backaddPhraseTrans,
+	txtaddPhraseTrans,
+	inputaddPhraseTrans,
+	backstaticCountry,
+	txtstaticCountry
+	
 }
 
 function showButtons(buttons)
@@ -938,3 +1033,4 @@ hideButtons(localLawyerButtons)
 showButtons(loginButtons)
 hideButtons(mainMenuButtons)
 hideButtons(registrationButtons)
+hideButtons(addPhraseButtons)
