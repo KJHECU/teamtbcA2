@@ -673,6 +673,7 @@ txtstaticCountry.font = native.newFont(native.systemFont, 12)
 -- Handle press events for the buttons
 local function onSwitchPress( event )
     local switch = event.target
+	 print( "Switch with ID '"..switch.id.."' is on: "..tostring(switch.isOn) )
 end
  
 -- Create a group for the radio button set
@@ -701,7 +702,6 @@ local radioButton2 = widget.newSwitch(
     }
 )
 radioGroup:insert( radioButton2 )
-
 
 -- scroll pane for local lawyer & country lists
 
