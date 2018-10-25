@@ -117,6 +117,8 @@ local function handleInput( event )
     if userType == 1 then
       hideButtons(currentButtons)
       showButtons(addLawyerButtons)
+      radioButton1:toFront()
+      radioButton2:toFront()
     end
   elseif id == 15 then
     if addLawyerValid() then
@@ -1004,7 +1006,6 @@ addLawyerButtons = {
 	txtaddLawyerMobile,
 	backstaticCountry,
 	txtstaticCountry,
-	
 }
 
 countryButtons = {
@@ -1042,7 +1043,7 @@ addPhraseButtons = {
 		txtstaticCountry,
 		radioButton1,
 		radioButton2,
-	
+    
 }
 
 function showButtons(buttons)
@@ -1069,3 +1070,4 @@ showButtons(loginButtons)
 hideButtons(mainMenuButtons)
 hideButtons(registrationButtons)
 hideButtons(addPhraseButtons)
+hideButtons(contactsButtons)
