@@ -159,7 +159,7 @@ local function handleInput( event )
     for row in db:nrows([[SELECT name FROM country WHERE id=]] .. currentCountryId) do
       countrySelectButton:setLabel("Current Country: " .. row.name)
       currentCountry = row.name
-      txtaddLawyerCountry.text = "Current Country: "..currentCountry
+      txtstaticCountry.text = "Current Country: "..currentCountry
     end
     hideButtons(currentButtons)
     showButtons(mainMenuButtons)
