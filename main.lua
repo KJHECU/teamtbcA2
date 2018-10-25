@@ -1042,6 +1042,7 @@ addPhraseButtons = {
 		txtstaticCountry,
 		radioButton1,
 		radioButton2,
+		radioGroup
 	
 }
 
