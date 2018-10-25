@@ -650,7 +650,6 @@ inputaddPhrasePrimary:setTextColor(0,0,0)
 inputaddPhrasePrimary.inputType = "default"
 inputaddPhrasePrimary.placeholder = "-- insert phrase--"
 inputaddPhrasePrimary.font = native.newFont(native.systemFont, 12)
-native.setKeyboardFocus(inputEmail)
 
 -- add Phrase Translation
 backaddPhraseTrans = display.newRect(display.contentWidth/2, display.contentHeight/4.1, display.contentWidth, display.contentHeight/15)
@@ -670,6 +669,39 @@ backstaticCountry:setFillColor (0, 0.8, 0.8)
 txtstaticCountry = display.newText("Current Country: "..currentCountry, display.contentWidth/1.4, display.contentHeight/2.05, display.contentWidth, display.contentHeight/15)
 txtstaticCountry:setTextColor(1,1,1)
 txtstaticCountry.font = native.newFont(native.systemFont, 12)
+
+-- Handle press events for the buttons
+local function onSwitchPress( event )
+    local switch = event.target
+end
+ 
+-- Create a group for the radio button set
+local radioGroup = display.newGroup()
+ 
+-- Create two associated radio buttons (inserted into the same display group)
+local radioButton1 = widget.newSwitch(
+    {
+        left = 150,
+        top = 200,
+        style = "radio",
+        id = "RadioButton1",
+        initialSwitchState = true,
+        onPress = onSwitchPress
+    }
+)
+radioGroup:insert( radioButton1 )
+ 
+local radioButton2 = widget.newSwitch(
+    {
+        left = 250,
+        top = 200,
+        style = "radio",
+        id = "RadioButton2",
+        onPress = onSwitchPress
+    }
+)
+radioGroup:insert( radioButton2 )
+
 
 -- scroll pane for local lawyer & country lists
 
@@ -705,7 +737,7 @@ function addButtonToScroll(scroll, row, num)
       width = 350,
       x = display.contentWidth/2,
       y = (num * 75) + 30,
-      fontSize = 16,
+      fontSize = 14,
       onRelease = handleInput
     }
   )
@@ -762,6 +794,7 @@ function addContactsToScroll(scroll, contactType, contactNum, num)
       width = 300,
       x = display.contentWidth/2,
       y = (num * 80) + 30,
+	  fontSize = 14,
     }
   )
   scroll:insert(button)
@@ -953,11 +986,11 @@ localLawyerButtons = {
 }
 
 addLawyerButtons = {
-	addButton( 15, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
+  addButton( 15, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
   addButton( 16, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
   backaddLawyer,
 	txtaddLawyer,
-  backaddLawyerEmail,
+	backaddLawyerEmail,
 	inputaddLawyerEmail,
 	txtaddLawyerEmail,
 	backaddLawyerFname,
@@ -997,16 +1030,18 @@ phraseButtons = {
 addPhraseButtons = {
 	addButton( 18, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
     addButton( 19, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
-	backaddPhrase,
-	txtaddPhrase,
-	backaddPhrasePrimary,
-	txtaddPhrasePrimary,
-	inputaddPhrasePrimary,
-	backaddPhraseTrans,
-	txtaddPhraseTrans,
-	inputaddPhraseTrans,
-	backstaticCountry,
-	txtstaticCountry
+		backaddPhrase,
+		txtaddPhrase,
+		backaddPhrasePrimary,
+		txtaddPhrasePrimary,
+		inputaddPhrasePrimary,
+		backaddPhraseTrans,
+		txtaddPhraseTrans,
+		inputaddPhraseTrans,
+		backstaticCountry,
+		txtstaticCountry,
+		radioButton1,
+		radioButton2,
 	
 }
 
