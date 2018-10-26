@@ -19,6 +19,7 @@ local db = sqlite3.open( path )
 local currentCountryId = 1
 local currentCountry = "Australia"
 local userType = 0
+local radioPhraseType = 0
 
 local loginForm = true
 local regForm = true
@@ -136,7 +137,13 @@ local function handleInput( event )
   if userType == 1 then
     hideButtons(currentButtons)
     showButtons(addPhraseButtons)
-  end     
+  end 
+  elseif id == 18 then
+    if addPhraseValid() then
+     addNewPhrase()
+	 hideButtons(currentButtons)
+     showButtons(phraseMenuButtons)
+    end  
   elseif id == 19 then
     hideButtons(currentButtons)
     showButtons(phraseMenuButtons)
@@ -154,7 +161,7 @@ local function handleInput( event )
     for row in db:nrows([[SELECT name FROM country WHERE id=]] .. currentCountryId) do
       countrySelectButton:setLabel("Current Country: " .. row.name)
       currentCountry = row.name
-      txtaddLawyerCountry.text = "Current Country: "..currentCountry
+      txtstaticCountry.text = "Current Country: "..currentCountry
     end
     hideButtons(currentButtons)
     showButtons(mainMenuButtons)
@@ -193,6 +200,7 @@ local function searchListenerCountry( event )
   end
 end
 
+-- function validating registration form
 function regFormValid()
   regForm = true
   if isEmpty(inputRegEmail) then
@@ -234,6 +242,7 @@ function regFormValid()
   return regForm
 end
 
+-- function validating add Lawyer form
 function addLawyerValid()
   addLawyerForm = true
   if isEmpty(inputaddLawyerEmail) then
@@ -255,7 +264,22 @@ function addLawyerValid()
   return addLawyerForm
 end
 
--- function which handles the registration of new users
+-- function validating add Phrase form
+function addPhraseValid()
+  addPhraseForm = true
+  if isEmpty(inputaddPhraseEnglish) then
+    inputaddPhraseEnglish.placeholder = "English phrase not provided"
+    addPhraseForm = false
+  end
+  if isEmpty(inputaddPhraseTrans) then
+    inputaddPhraseTrans.placeholder = "Translated phrase not provided"
+    addPhraseForm = false
+  end
+  return addPhraseForm
+end
+
+
+-- function which handles the registration of new users (INSERT)
 function submitRegistration()
   query = [[INSERT INTO user (email, password, name, mobilenum, nokemail, nokname, nokmobile) VALUES ("]]
     .. inputRegEmail.text .. [[", "]] .. inputRegPassword.text .. [[", "]] .. inputFname.text .. " " .. inputSname.text
@@ -264,12 +288,21 @@ function submitRegistration()
   db:exec(query)
 end
 
--- function which handles the addition of new laywers
+-- function which handles the addition of new laywers (INSERT)
 function addNewLawyer()
   query = [[INSERT INTO lawyer (email, name, mobilenum, countryid) VALUES ("]]
     .. inputaddLawyerEmail.text .. [[", "]] .. inputaddLawyerFname.text .. " " .. inputaddLawyerSname.text .. [[", "]] .. inputaddLawyerMobile.text .. [[", "]] .. currentCountryId ..[[");]]
   db:exec(query)
 end
+
+-- function which handles the addition of new phrases (INSERT)
+function addNewPhrase()
+  query = [[INSERT INTO phrase (english, translated, countryid, phrasetype) VALUES ("]]
+    .. inputaddPhraseEnglish.text .. [[", "]] .. inputaddPhraseTrans.text .. [[", "]] .. currentCountryId .. [[", "]] .. radioPhraseType .. [[");]]
+  db:exec(query)
+  print(query)
+end
+
 
 -- function which handles login
 function loginAccepted()
@@ -641,17 +674,17 @@ txtaddPhrase:setFillColor (1,1,1 )
 txtaddPhrase.x = display.contentWidth/1.25
 txtaddPhrase.y = display.contentHeight/12.5
 
--- add Phrase Primary
-backaddPhrasePrimary = display.newRect(display.contentWidth/2, display.contentHeight/6.1, display.contentWidth, display.contentHeight/15)
-backaddPhrasePrimary :setFillColor (0, 0.8, 0.8)
-inputaddPhrasePrimary  = native.newTextField(0,0,200,30)
-txtaddPhrasePrimary  = display.newText( "Phrase",display.contentWidth/0.84, display.contentHeight/5.6, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
-inputaddPhrasePrimary.x = display.contentWidth/2.9
-inputaddPhrasePrimary.y = display.contentHeight/6.2
-inputaddPhrasePrimary:setTextColor(0,0,0)
-inputaddPhrasePrimary.inputType = "default"
-inputaddPhrasePrimary.placeholder = "-- insert phrase--"
-inputaddPhrasePrimary.font = native.newFont(native.systemFont, 12)
+-- add Phrase English
+backaddPhraseEnglish = display.newRect(display.contentWidth/2, display.contentHeight/6.1, display.contentWidth, display.contentHeight/15)
+backaddPhraseEnglish :setFillColor (0, 0.8, 0.8)
+inputaddPhraseEnglish  = native.newTextField(0,0,200,30)
+txtaddPhraseEnglish  = display.newText( "English",display.contentWidth/0.84, display.contentHeight/5.6, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+inputaddPhraseEnglish.x = display.contentWidth/2.9
+inputaddPhraseEnglish.y = display.contentHeight/6.2
+inputaddPhraseEnglish:setTextColor(0,0,0)
+inputaddPhraseEnglish.inputType = "default"
+inputaddPhraseEnglish.placeholder = "-- insert english phrase--"
+inputaddPhraseEnglish.font = native.newFont(native.systemFont, 12)
 
 -- add Phrase Translation
 backaddPhraseTrans = display.newRect(display.contentWidth/2, display.contentHeight/4.1, display.contentWidth, display.contentHeight/15)
@@ -670,40 +703,50 @@ backstaticCountry= display.newRect(display.contentWidth/2, display.contentHeight
 backstaticCountry:setFillColor (0, 0.8, 0.8)
 txtstaticCountry = display.newText("Current Country: "..currentCountry, display.contentWidth/1.4, display.contentHeight/2.05, display.contentWidth, display.contentHeight/15)
 txtstaticCountry:setTextColor(1,1,1)
-txtstaticCountry.font = native.newFont(native.systemFont, 12)
+txtstaticCountry.font = native.newFont(native.systemFont, 10)
 
--- Handle press events for the buttons
+-- Handle press events for add Phrase radio buttons
 local function onSwitchPress( event )
     local switch = event.target
-	 print( "Switch with ID '"..switch.id.."' is on: "..tostring(switch.isOn) )
+	radioPhraseType = event.target.id
+	print (radioPhraseType)
 end
  
 -- Create a group for the radio button set
-local radioGroup = display.newGroup()
+local radioPhraseGroup = display.newGroup()
  
+backradioPhrase = display.newRect(display.contentWidth/2, display.contentHeight/2.5, display.contentWidth, display.contentHeight/15)
+backradioPhrase:setFillColor (0, 0.8, 0.8) 
+txtaddUsefulPhrase = display.newText( "Useful", display.contentWidth/1.375, display.contentHeight/2.425, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+txtaddLegalPhrase = display.newText( "Legal", display.contentWidth/0.925, display.contentHeight/2.425, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+
+radioPhraseGroup:insert( backradioPhrase )
+radioPhraseGroup:insert( txtaddUsefulPhrase )
+radioPhraseGroup:insert( txtaddLegalPhrase )
+
 -- Create two associated radio buttons (inserted into the same display group)
-local radioButton1 = widget.newSwitch(
+local radioUsefulPhrase = widget.newSwitch(
     {
-        left = 150,
-        top = 200,
+        left = 120,
+        top = 175,
         style = "radio",
-        id = "RadioButton1",
+        id = "0",
         initialSwitchState = true,
-        onPress = onSwitchPress
+        onPress = onSwitchPress,
     }
 )
-radioGroup:insert( radioButton1 )
+radioPhraseGroup:insert( radioUsefulPhrase )
  
-local radioButton2 = widget.newSwitch(
+local radioLegalPhrase = widget.newSwitch(
     {
-        left = 250,
-        top = 200,
+        left = 225,
+        top = 175,
         style = "radio",
-        id = "RadioButton2",
+        id = "1",
         onPress = onSwitchPress
     }
 )
-radioGroup:insert( radioButton2 )
+radioPhraseGroup:insert( radioLegalPhrase )
 
 -- scroll pane for local lawyer & country lists
 
@@ -1033,17 +1076,27 @@ addPhraseButtons = {
     addButton( 19, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
 		backaddPhrase,
 		txtaddPhrase,
-		backaddPhrasePrimary,
-		txtaddPhrasePrimary,
-		inputaddPhrasePrimary,
+		backaddPhraseEnglish,
+		txtaddPhraseEnglish,
+		inputaddPhraseEnglish,
 		backaddPhraseTrans,
 		txtaddPhraseTrans,
 		inputaddPhraseTrans,
 		backstaticCountry,
 		txtstaticCountry,
+<<<<<<< HEAD
 		radioButton1,
 		radioButton2,
     
+=======
+		radioUsefulPhrase,
+		radioLegalPhrase,
+		backradioPhrase,
+		txtaddUsefulPhrase,
+		txtaddLegalPhrase,
+		radioPhraseGroup
+	
+>>>>>>> cafcca236abe34c8fe372a751bdcee2525b1bab0
 }
 
 function showButtons(buttons)
