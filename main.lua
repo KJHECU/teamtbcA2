@@ -3,10 +3,12 @@
 -- main.lua
 --
 -----------------------------------------------------------------------------------------
+-- required for unit tests
+require "lunit"
 
 -- background image properties
 
-local background = display.newImage("Background.jpg")
+local background = display.newImage("background.jpg")
 background.anchorX = 0
 background.anchorY = 0
 background:scale(0.45, 0.72)
@@ -672,3 +674,5 @@ hideButtons(localLawyerButtons)
 showButtons(loginButtons)
 hideButtons(mainMenuButtons)
 hideButtons(registrationButtons)
+
+lunit.run("unit_tests")
