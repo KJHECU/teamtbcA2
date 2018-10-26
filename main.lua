@@ -342,8 +342,6 @@ function isEmpty(field)
 	end
 end
 
-
-
 -- utility to make buttons
 local function addButton( ID, x, y, width, height, btnType, label )
   if btnType == "icon" then
@@ -871,7 +869,7 @@ function addPhraseToScroll(scroll, row, num)
       width = display.contentWidth - 30,
       x = display.contentWidth/2,
       y = (num * 60) + 30,
-	  fontSize = 14
+      fontSize = 14
     }
   )
   button2 = display.newText(
@@ -889,14 +887,19 @@ function addPhraseToScroll(scroll, row, num)
   bg2:setFillColor(1,1,1)
   button1:setFillColor(black)
   button2:setFillColor(black)
+  starIcon = display.newImage("star.png")
+  starIcon.isVisible = false
+  favourite = addButton( "favourite", display.contentWidth - 20, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
   scroll:insert(bg1)
   scroll:insert(button1)
   scroll:insert(bg2)
   scroll:insert(button2)
+  scroll:insert(favourite)
   table.insert(currentButtons, button1)
   table.insert(currentButtons, bg1)
   table.insert(currentButtons, button2)
   table.insert(currentButtons, bg2)
+  table.insert(currentButtons, favourite)
 end
 
 function populatePhrases( scroll, search, phraseType )
@@ -1062,13 +1065,12 @@ contactsButtons = {
 }
 
 phraseButtons = {
-    addButton( 17, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "phraseAdd", addPhraseButton),
+  addButton( 17, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "phraseAdd", addPhraseButton),
 	countryGroup,
 	phraseScroll,
 	phraseText,
 	phraseRectangle,
-	addPhraseButton,
-	
+	addPhraseButton
 }
 
 addPhraseButtons = {
