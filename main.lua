@@ -175,7 +175,6 @@ local function onRegister(event)
 	if (event.action == "clicked") then
 		local i = event.index
 		if (i ==  1) then
-
 		end
 	end
 end
@@ -403,6 +402,7 @@ local function addButton( ID, x, y, width, height, btnType, label )
           height = height,
 		}
       )
+
  else
     button = widget.newButton(
         {
@@ -887,19 +887,19 @@ function addPhraseToScroll(scroll, row, num)
   bg2:setFillColor(1,1,1)
   button1:setFillColor(black)
   button2:setFillColor(black)
-  starIcon = display.newImage("star.png")
-  starIcon.isVisible = false
-  favourite = addButton( "favourite", display.contentWidth - 20, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
+  starIcon = display.newImage("star.png", button1.x + 110, button1.y - 20)
+  starIcon:scale(0.05, 0.05)
+  favourite = addButton( "favourite", button1.x , button1.y - 10, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
   scroll:insert(bg1)
   scroll:insert(button1)
   scroll:insert(bg2)
   scroll:insert(button2)
-  scroll:insert(favourite)
+  scroll:insert(starIcon)
   table.insert(currentButtons, button1)
   table.insert(currentButtons, bg1)
   table.insert(currentButtons, button2)
   table.insert(currentButtons, bg2)
-  table.insert(currentButtons, favourite)
+  table.insert(currentButtons, starIcon)
 end
 
 function populatePhrases( scroll, search, phraseType )
