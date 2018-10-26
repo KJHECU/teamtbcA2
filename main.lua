@@ -1084,19 +1084,12 @@ addPhraseButtons = {
 		inputaddPhraseTrans,
 		backstaticCountry,
 		txtstaticCountry,
-<<<<<<< HEAD
-		radioButton1,
-		radioButton2,
-    
-=======
 		radioUsefulPhrase,
 		radioLegalPhrase,
 		backradioPhrase,
 		txtaddUsefulPhrase,
 		txtaddLegalPhrase,
 		radioPhraseGroup
-	
->>>>>>> cafcca236abe34c8fe372a751bdcee2525b1bab0
 }
 
 function showButtons(buttons)
