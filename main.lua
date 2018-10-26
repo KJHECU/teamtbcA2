@@ -118,8 +118,6 @@ local function handleInput( event )
     if userType == 1 then
       hideButtons(currentButtons)
       showButtons(addLawyerButtons)
-      radioButton1:toFront()
-      radioButton2:toFront()
     end
   elseif id == 15 then
     if addLawyerValid() then
@@ -143,11 +141,12 @@ local function handleInput( event )
      addNewPhrase()
 	 hideButtons(currentButtons)
      showButtons(phraseMenuButtons)
-    end  
+  end  
   elseif id == 19 then
     hideButtons(currentButtons)
     showButtons(phraseMenuButtons)
 	showButtons(menuBarButtons)
+  elseif id == "favourite" then
     
   elseif id == 99 then
     hideButtons(currentButtons)
@@ -881,26 +880,29 @@ function addPhraseToScroll(scroll, row, num)
       y = button1.y + display.contentHeight/8.4
     }
   )
-  bg1 = display.newRect( button1.x, button1.y - 20, display.contentWidth, button1.height + 10 )
+  bg1 = display.newRect( button1.x, button1.y - 20, display.contentWidth, button1.height - 10 )
   bg1:setFillColor(1,1,1)
-  bg2 = display.newRect( button2.x - 10, button2.y - 20, button2.width + 20, button2.height + 10 )
+  bg2 = display.newRect( button2.x - 10, button2.y - 20, button2.width + 20, button1.height - 10  )
   bg2:setFillColor(1,1,1)
   button1:setFillColor(black)
   button2:setFillColor(black)
   starIcon = display.newImage("star.png", button1.x + 110, button1.y - 20)
+  arrowImage = display.newImage("arrow-down-and-right.png", button1.x - 130, button1.y + 18 )
   starIcon:scale(0.05, 0.05)
-  favourite = addButton( "favourite", button1.x , button1.y - 10, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
+  favourite = addButton( "favourite", button1.x + 110, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
   scroll:insert(bg1)
   scroll:insert(button1)
   scroll:insert(bg2)
   scroll:insert(button2)
   scroll:insert(starIcon)
   scroll:insert(favourite)
+  scroll:insert(arrowImage)
   table.insert(currentButtons, button1)
   table.insert(currentButtons, bg1)
   table.insert(currentButtons, button2)
   table.insert(currentButtons, bg2)
   table.insert(currentButtons, starIcon)
+  table.insert(currentButtons, arrowImage)
   table.insert(currentButtons, favourite)
 end
 
