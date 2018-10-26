@@ -877,7 +877,8 @@ function addPhraseToScroll(scroll, row, num)
       height = display.contentHeight/8.4,
       width = display.contentWidth - 60,
       x = display.contentWidth/2 + 30,
-      y = button1.y + display.contentHeight/8.4
+      y = button1.y + display.contentHeight/8.4,
+	  fontSize = 14
     }
   )
   bg1 = display.newRect( button1.x, button1.y - 20, display.contentWidth, button1.height - 10 )
