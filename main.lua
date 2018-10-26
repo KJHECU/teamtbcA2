@@ -864,10 +864,10 @@ function addPhraseToScroll(scroll, row, num)
   button1 = display.newText(
     {
       text = row.english,
-      height = display.contentHeight/8.4,
+      height = display.contentHeight/8,
       width = display.contentWidth - 30,
       x = display.contentWidth/2,
-      y = (num * 60) + 30,
+      y = (num * 60) + 60,
       fontSize = 14
     }
   )
@@ -882,7 +882,7 @@ function addPhraseToScroll(scroll, row, num)
   )
   bg1 = display.newRect( button1.x, button1.y - 20, display.contentWidth, button1.height - 10 )
   bg1:setFillColor(1,1,1)
-  bg2 = display.newRect( button2.x - 10, button2.y - 20, button2.width + 20, button1.height - 10  )
+  bg2 = display.newRect( button2.x - 10, button2.y - 20, button2.width + 20, button1.height - 10 )
   bg2:setFillColor(1,1,1)
   button1:setFillColor(black)
   button2:setFillColor(black)
