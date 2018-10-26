@@ -895,11 +895,13 @@ function addPhraseToScroll(scroll, row, num)
   scroll:insert(bg2)
   scroll:insert(button2)
   scroll:insert(starIcon)
+  scroll:insert(favourite)
   table.insert(currentButtons, button1)
   table.insert(currentButtons, bg1)
   table.insert(currentButtons, button2)
   table.insert(currentButtons, bg2)
   table.insert(currentButtons, starIcon)
+  table.insert(currentButtons, favourite)
 end
 
 function populatePhrases( scroll, search, phraseType )
