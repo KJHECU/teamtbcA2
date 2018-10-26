@@ -794,7 +794,7 @@ lawyerSearch.id = "lawyerId"
 lawyerSearch:addEventListener("userInput", searchListenerLaw)
 
 countryScroll = getScroll( "country" )
-countrySearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
+countrySearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,26)
 countrySearch.placeholder = "Search Country"
 countrySearch.id = "countryId"
 countrySearch:addEventListener("userInput", searchListenerCountry)
