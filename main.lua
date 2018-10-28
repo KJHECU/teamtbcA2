@@ -346,7 +346,7 @@ end
 -- function which checks for empty input fields
 function deletePhrase(id)
 	 phraseID = string.sub( id, 4 )
-	 query = [[DELETE FROM phrase WHERE id="]] .. phraseID .. [["]]
+	 query = [[DELETE FROM phrase WHERE id=]] .. phraseID .. [[]]
 	 db:exec(query)
 	 print(query)
 end
