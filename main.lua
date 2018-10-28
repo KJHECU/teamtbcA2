@@ -998,8 +998,7 @@ function populateProfile ( scroll )
       height = display.contentHeight/9,
       width = display.contentWidth,
       x = display.contentWidth/2,
-      y = 189,
-      --textOnly = true
+      y = 189
     }
   )
   scroll:insert(button)
