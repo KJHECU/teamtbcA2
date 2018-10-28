@@ -865,7 +865,7 @@ function addPhraseToScroll(scroll, row, num)
     {
       text = row.english,
       height = display.contentHeight/8,
-      width = display.contentWidth - 30,
+      width = display.contentWidth - 80,
       x = display.contentWidth/2,
       y = (num * 60) + 60,
       fontSize = 14
@@ -875,7 +875,7 @@ function addPhraseToScroll(scroll, row, num)
     {
       text = row.translated,
       height = display.contentHeight/8.4,
-      width = display.contentWidth - 60,
+      width = display.contentWidth - 90,
       x = display.contentWidth/2 + 30,
       y = button1.y + display.contentHeight/8.4,
 	  fontSize = 14
@@ -883,14 +883,19 @@ function addPhraseToScroll(scroll, row, num)
   )
   bg1 = display.newRect( button1.x, button1.y - 20, display.contentWidth, button1.height - 10 )
   bg1:setFillColor(1,1,1)
-  bg2 = display.newRect( button2.x - 10, button2.y - 20, button2.width + 20, button1.height - 10 )
+  bg2 = display.newRect( button2.x , button2.y - 20, button2.width + 50, button1.height - 10 )
   bg2:setFillColor(1,1,1)
   button1:setFillColor(black)
   button2:setFillColor(black)
-  starIcon = display.newImage("star.png", button1.x + 110, button1.y - 20)
+  starIcon = display.newImage("star.png", button1.x + 105, button1.y - 20)
+      starIcon:scale(0.05, 0.05)
+  	  favourite = addButton( "favourite".. row.id , button1.x + 105, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
+  
   arrowImage = display.newImage("arrow-down-and-right.png", button1.x - 130, button1.y + 18 )
-  starIcon:scale(0.05, 0.05)
-  favourite = addButton( "favourite".. num / 2, button1.x + 110, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
+  
+  binIcon = display.newImage("recycle-bin.png", button1.x + 135, button1.y - 20)
+		binIcon:scale (0.75, 0.75)
+		bin = addButton( "bin".. row.id , button1.x + 135, button1.y - 20, 25, 25, "icon", binIcon ) --( ID, x, y, width, height, btnType, label )
   scroll:insert(bg1)
   scroll:insert(button1)
   scroll:insert(bg2)
@@ -898,6 +903,9 @@ function addPhraseToScroll(scroll, row, num)
   scroll:insert(starIcon)
   scroll:insert(favourite)
   scroll:insert(arrowImage)
+  scroll:insert(binIcon)
+  scroll:insert(bin)
+  
   table.insert(currentButtons, button1)
   table.insert(currentButtons, bg1)
   table.insert(currentButtons, button2)
@@ -905,6 +913,8 @@ function addPhraseToScroll(scroll, row, num)
   table.insert(currentButtons, starIcon)
   table.insert(currentButtons, arrowImage)
   table.insert(currentButtons, favourite)
+  table.insert(currentButtons, binIcon)
+  table.insert(currentButtons, bin)
 end
 
 function populatePhrases( scroll, search, phraseType )
