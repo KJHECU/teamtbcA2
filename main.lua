@@ -50,8 +50,9 @@ local function handleInput( event )
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   elseif id == 3 then
-    hideButtons(mainMenuButtons)
+    hideButtons(currentButtons)
     showButtons(profileButtons)
+	showButtons(menuBarButtons)
     populateProfile(profileScroll)
     profileScroll.isVisible = true
   elseif id == 4 then
@@ -1103,7 +1104,7 @@ registrationButtons = {
 
 profileButtons = {
   countryGroup,
-  profileScroll
+  profileScroll,
 }
 
 localLawyerButtons = {
