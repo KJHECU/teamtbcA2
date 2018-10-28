@@ -50,9 +50,8 @@ local function handleInput( event )
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   elseif id == 3 then
-    hideButtons(currentButtons)
+    hideButtons(mainMenuButtons)
     showButtons(profileButtons)
-	showButtons(menuBarButtons)
     populateProfile(profileScroll)
     profileScroll.isVisible = true
   elseif id == 4 then
@@ -962,6 +961,8 @@ function addProfileToScroll(scroll, userDetailType, userContact, num)
   button = widget.newButton(
     {
       label = userContact .. "\n" .. userDetailType,
+      labelAlign = "left",
+      labelXOffset = 160,
       shape = "roundedRect",
       cornerRadius = 0,
       fillColor = white,
@@ -977,7 +978,11 @@ function addProfileToScroll(scroll, userDetailType, userContact, num)
 end
 
 function populateProfile ( scroll )
-  local profileImg = display.newImage("myPortrait.jpg" ,display.contentWidth/2, display.contentHeight/4)
+  query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
+  for row in db:nrows(query) do
+  	userImg = row.userpic
+  end
+  profileImg = display.newImage(userImg ,display.contentWidth/2, display.contentHeight/4)
   scroll:insert(profileImg)
   table.insert(currentButtons, profileImg)
 
@@ -986,13 +991,14 @@ function populateProfile ( scroll )
   button = widget.newButton(
     {
       label = row.name,
+      shape = "rect",
+      labelAlign = "left",
       labelColor = { default={ 0, 0, 0 },},
       fontSize = 34,
       height = display.contentHeight/9,
       width = display.contentWidth,
-      x = display.contentWidth/15,
-      y = 189,
-      textOnly = true
+      x = display.contentWidth/2,
+      y = 189
     }
   )
   scroll:insert(button)
@@ -1104,7 +1110,7 @@ registrationButtons = {
 
 profileButtons = {
   countryGroup,
-  profileScroll,
+  profileScroll
 }
 
 localLawyerButtons = {
