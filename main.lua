@@ -49,6 +49,11 @@ local function handleInput( event )
     hideButtons(phraseButtons)
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
+  elseif id == 3 then
+    hideButtons(mainMenuButtons)
+    showButtons(profileButtons)
+    populateProfile(profileScroll)
+    profileScroll.isVisible = true
   elseif id == 4 then
     hideButtons(currentButtons)
     populateScroll(lawyerScroll, nil)
@@ -826,10 +831,16 @@ end
 
 -- scroll pane for useful contacts
 function addContactsToScroll(scroll, contactType, contactNum, num)
+  if contactType == "Emergency" then
+  	backgroundFile = "emergency.png"
+  elseif contactType == "Embassy" then
+  	backgroundFile = "embassy.png"
+  else
+  	backgroundFile = "noKinPhone.png"
+  end
   button = widget.newButton(
     {
       label = contactNum .. "\n" .. contactType,
-      shape = "roundedRect",
       cornerRadius = 0,
       fillColor = white,
       strokeWidth = 0,
@@ -838,6 +849,7 @@ function addContactsToScroll(scroll, contactType, contactNum, num)
       x = display.contentWidth/2,
       y = (num * 80) + 30,
 	  fontSize = 14,
+	  defaultFile = backgroundFile
     }
   )
   scroll:insert(button)
@@ -845,17 +857,21 @@ function addContactsToScroll(scroll, contactType, contactNum, num)
 end
 
 function populateContacts ( scroll )
+  contactType = nil
   query = [[SELECT * FROM country WHERE id=]] .. currentCountryId
   for row in db:nrows(query) do
-    addContactsToScroll(scroll, "Emergency", row.emergency, 0)
+  	contactType = "Emergency"
+    addContactsToScroll(scroll, contactType, row.emergency, 0)
   end
+  contactType = "Embassy"
   query = [[SELECT * FROM country WHERE id=]] .. currentCountryId
   for row in db:nrows(query) do
-    addContactsToScroll(scroll, "Embassy", row.embassy, 1)
+    addContactsToScroll(scroll, contactType, row.embassy, 1)
   end
+  contactType = "Next of Kin"
   query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
   for row in db:nrows(query) do
-    addContactsToScroll(scroll, "Next of Kin", row.nokname, 2)
+    addContactsToScroll(scroll, contactType, row.nokname, 2)
   end
 end
 contactsScroll = getScroll( "contacts" )
@@ -940,6 +956,66 @@ local phrasesGroup = display.newGroup()
 phrasesGroup:insert(phraseText)
 phrasesGroup:insert(addPhraseButton)
 
+-- User profile
+function addProfileToScroll(scroll, userDetailType, userContact, num)
+  button = widget.newButton(
+    {
+      label = userContact .. "\n" .. userDetailType,
+      shape = "roundedRect",
+      cornerRadius = 0,
+      fillColor = white,
+      strokeWidth = 0,
+      height = display.contentHeight/9,
+      width = display.contentWidth,
+      x = display.contentWidth/2,
+      y = (num * 53) + 30
+    }
+  )
+  scroll:insert(button)
+  table.insert(currentButtons, button)
+end
+
+function populateProfile ( scroll )
+  local profileImg = display.newImage("myPortrait.jpg" ,display.contentWidth/2, display.contentHeight/4)
+  scroll:insert(profileImg)
+  table.insert(currentButtons, profileImg)
+
+  query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
+  for row in db:nrows(query) do
+  button = widget.newButton(
+    {
+      label = row.name,
+      labelColor = { default={ 0, 0, 0 },},
+      fontSize = 34,
+      height = display.contentHeight/9,
+      width = display.contentWidth,
+      x = display.contentWidth/15,
+      y = 189,
+      textOnly = true
+    }
+  )
+  scroll:insert(button)
+  table.insert(currentButtons, button)
+  end
+  query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
+  local i = 4
+  for row in db:nrows(query) do
+    while (i == 4) do
+      addProfileToScroll(scroll, "Mobile", row.mobilenum, i)
+      i = i + 1
+    end
+    while (i == 5) do
+      addProfileToScroll(scroll, "Work", row.worknum, i)
+      i = i + 1
+    end
+    while (i == 6) do
+      addProfileToScroll(scroll, "E-mail", row.email, i)
+      i = nil
+    end
+  end
+end
+profileScroll = getScroll( "profile" )
+
 -- Current Country display group (inc button)
 
 local countryGroup = display.newGroup()
@@ -1023,6 +1099,11 @@ registrationButtons = {
 	backKinMobile,
 	inputKinMobile,
 	txtKinMobile
+}
+
+profileButtons = {
+  countryGroup,
+  profileScroll
 }
 
 localLawyerButtons = {
