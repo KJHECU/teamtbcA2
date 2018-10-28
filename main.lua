@@ -1145,11 +1145,6 @@ contactsButtons = {
   contactsScroll
 }
 
-profileButtons = {
-  countryGroup,
-  profileScroll
-}
-
 phraseButtons = {
   addButton( 17, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "phraseAdd", addPhraseButton),
 	countryGroup,
