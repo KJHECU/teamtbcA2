@@ -146,8 +146,11 @@ local function handleInput( event )
     hideButtons(currentButtons)
     showButtons(phraseMenuButtons)
 	showButtons(menuBarButtons)
-  elseif id == "favourite" then
-    
+  elseif string.starts(id,"bin") then
+    deletePhrase(id)
+	hideButtons(currentButtons)
+    showButtons(phraseMenuButtons)
+	showButtons(menuBarButtons)
   elseif id == 99 then
     hideButtons(currentButtons)
     populateScroll(countryScroll, nil)
@@ -339,6 +342,16 @@ function isEmpty(field)
 		return false
 	end
 end
+
+-- function which checks for empty input fields
+function deletePhrase(id)
+	 phraseID = string.sub( id, 4 )
+	 query = [[DELETE FROM phrase WHERE id="]] .. phraseID .. [["]]
+	 db:exec(query)
+	 print(query)
+end
+
+
 
 -- utility to make buttons
 local function addButton( ID, x, y, width, height, btnType, label )
