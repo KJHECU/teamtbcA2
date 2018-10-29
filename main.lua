@@ -154,8 +154,14 @@ local function handleInput( event )
     hideButtons(currentButtons)
     showButtons(phraseMenuButtons)
 	showButtons(menuBarButtons)
-  elseif string.starts(id,"bin") then
+  elseif string.starts(id,"binPhrase") then
     deletePhrase(id)
+	hideButtons(currentButtons)
+    showButtons(phraseMenuButtons)
+	showButtons(menuBarButtons)
+  elseif string.starts(id,"binLawyer") then
+	print("hitting this")
+    deleteLawyer(id)
 	hideButtons(currentButtons)
     showButtons(phraseMenuButtons)
 	showButtons(menuBarButtons)
@@ -358,10 +364,18 @@ function isEmpty(field)
 	end
 end
 
--- function which checks for empty input fields
+-- function which deletes phrases
 function deletePhrase(id)
-	 phraseID = string.sub( id, 4 )
+	 phraseID = string.sub( id, 10 )
 	 query = [[DELETE FROM phrase WHERE id=]] .. phraseID
+	 db:exec(query)
+	 print(query)
+end
+
+-- function which deletes lawyers
+function deleteLawyer(id)
+	 lawyerID = string.sub( id, 10 )
+	 query = [[DELETE FROM lawyer WHERE id=]] .. lawyerID
 	 db:exec(query)
 	 print(query)
 end
@@ -811,8 +825,25 @@ function addButtonToScroll(scroll, row, num)
       onRelease = handleInput
     }
   )
-  scroll:insert(button)
-  table.insert(currentButtons, button)
+  
+  if scroll == lawyerScroll then
+
+	scroll:insert(button)
+	table.insert(currentButtons, button)
+	
+	binLawyerIcon = display.newImage("recycle-bin.png", button.x + 120, button.y )
+	binLawyerIcon:scale (0.75, 0.75)
+	binLawyer = addButton( "binLawyer".. row.id , button.x + 120, button.y , 25, 25, "icon", binLawyerIcon ) --( ID, x, y, width, height, btnType, label )
+	
+	scroll:insert(binLawyerIcon)
+	scroll:insert(binLawyer)
+	table.insert(currentButtons, binLawyerIcon)
+	table.insert(currentButtons, binLawyer)
+		
+  else
+	  scroll:insert(button)
+	  table.insert(currentButtons, button)
+  end
 end
 
 lawyerScroll = getScroll( "lawyer" )
@@ -930,9 +961,9 @@ function addPhraseToScroll(scroll, row, num)
   starIcon:scale(0.05, 0.05)
   favourite = addButton( "favourite".. row.id , button1.x + 120, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
   arrowImage = display.newImage("arrow-down-and-right.png", button1.x - 105, button1.y + 30 )
-  binIcon = display.newImage("recycle-bin.png", button1.x + 160, button1.y - 20)
-  binIcon:scale (0.75, 0.75)
-  bin = addButton( "bin".. row.id , button1.x + 160, button1.y - 20, 25, 25, "icon", binIcon ) --( ID, x, y, width, height, btnType, label )
+  binPhraseIcon = display.newImage("recycle-bin.png", button1.x + 160, button1.y - 20)
+  binPhraseIcon:scale (0.75, 0.75)
+  binPhrase = addButton( "binPhrase".. row.id , button1.x + 160, button1.y - 20, 25, 25, "icon", binIcon ) --( ID, x, y, width, height, btnType, label )
   scroll:insert(bg1)
   scroll:insert(button1)
   scroll:insert(bg2)
@@ -940,8 +971,8 @@ function addPhraseToScroll(scroll, row, num)
   scroll:insert(starIcon)
   scroll:insert(favourite)
   scroll:insert(arrowImage)
-  scroll:insert(binIcon)
-  scroll:insert(bin)
+  scroll:insert(binPhraseIcon)
+  scroll:insert(binPhrase)
   
   table.insert(currentButtons, button1)
   table.insert(currentButtons, bg1)
@@ -950,8 +981,8 @@ function addPhraseToScroll(scroll, row, num)
   table.insert(currentButtons, starIcon)
   table.insert(currentButtons, arrowImage)
   table.insert(currentButtons, favourite)
-  table.insert(currentButtons, binIcon)
-  table.insert(currentButtons, bin)
+  table.insert(currentButtons, binPhraseIcon)
+  table.insert(currentButtons, binPhrase)
 end
 
 function populatePhrases( scroll, search, phraseType )
