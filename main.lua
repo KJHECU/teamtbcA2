@@ -19,6 +19,7 @@ local db = sqlite3.open( path )
 local currentCountryId = 1
 local currentCountry = "Australia"
 local userType = 0
+local currentUserId
 local radioPhraseType = 0
 
 local loginForm = true
@@ -50,9 +51,11 @@ local function handleInput( event )
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   elseif id == 3 then
-    hideButtons(mainMenuButtons)
+    profileScroll = getScroll( "profile" )
+    hideButtons(currentButtons)
     showButtons(profileButtons)
-    populateProfile(profileScroll)
+    showButtons(menuBarButtons)
+    populateProfile("user", currentUserId, profileScroll)
     profileScroll.isVisible = true
   elseif id == 4 then
     hideButtons(currentButtons)
@@ -94,7 +97,7 @@ local function handleInput( event )
     phraseScroll.isVisible = true
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
-	if userType == 1 then
+    if userType == 1 then
 		 addPhraseButton.isVisible = true
 		else
 		 addPhraseButton.isVisible = false
@@ -123,8 +126,6 @@ local function handleInput( event )
     if userType == 1 then
       hideButtons(currentButtons)
       showButtons(addLawyerButtons)
-      radioButton1:toFront()
-      radioButton2:toFront()
     end
   elseif id == 15 then
     if addLawyerValid() then
@@ -148,12 +149,16 @@ local function handleInput( event )
      addNewPhrase()
 	 hideButtons(currentButtons)
      showButtons(phraseMenuButtons)
-    end  
+  end  
   elseif id == 19 then
     hideButtons(currentButtons)
     showButtons(phraseMenuButtons)
 	showButtons(menuBarButtons)
-    
+  elseif string.starts(id,"bin") then
+    deletePhrase(id)
+	hideButtons(currentButtons)
+    showButtons(phraseMenuButtons)
+	showButtons(menuBarButtons)
   elseif id == 99 then
     hideButtons(currentButtons)
     populateScroll(countryScroll, nil)
@@ -171,6 +176,13 @@ local function handleInput( event )
     hideButtons(currentButtons)
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
+  elseif string.starts(id, "lawyer") then
+    profileScroll = getScroll( "profile" )
+    hideButtons(currentButtons)
+    showButtons(profileButtons)
+    showButtons(menuBarButtons)
+    populateProfile("lawyer", id:sub(7), profileScroll)
+    profileScroll.isVisible = true
   end
 end
 
@@ -180,7 +192,6 @@ local function onRegister(event)
 	if (event.action == "clicked") then
 		local i = event.index
 		if (i ==  1) then
-
 		end
 	end
 end
@@ -347,6 +358,16 @@ function isEmpty(field)
 	end
 end
 
+-- function which checks for empty input fields
+function deletePhrase(id)
+	 phraseID = string.sub( id, 4 )
+	 query = [[DELETE FROM phrase WHERE id=]] .. phraseID
+	 db:exec(query)
+	 print(query)
+end
+
+
+
 -- utility to make buttons
 local function addButton( ID, x, y, width, height, btnType, label )
   if btnType == "icon" then
@@ -408,6 +429,7 @@ local function addButton( ID, x, y, width, height, btnType, label )
           height = height,
 		}
       )
+
  else
     button = widget.newButton(
         {
@@ -800,7 +822,7 @@ lawyerSearch.id = "lawyerId"
 lawyerSearch:addEventListener("userInput", searchListenerLaw)
 
 countryScroll = getScroll( "country" )
-countrySearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
+countrySearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,26)
 countrySearch.placeholder = "Search Country"
 countrySearch.id = "countryId"
 countrySearch:addEventListener("userInput", searchListenerCountry)
@@ -881,41 +903,55 @@ function addPhraseToScroll(scroll, row, num)
   button1 = display.newText(
     {
       text = row.english,
-      height = display.contentHeight/8.4,
-      width = display.contentWidth - 30,
-      x = display.contentWidth/2,
-      y = (num * 60) + 30,
+      height = display.contentHeight/8,
+      width = display.contentWidth - 80,
+      x = display.contentWidth/2.3,
+      y = (num * 60) + 62,
       fontSize = 14
     }
   )
   button2 = display.newText(
     {
       text = row.translated,
-      height = display.contentHeight/8.4,
-      width = display.contentWidth - 60,
+      height = display.contentHeight/9,
+      width = display.contentWidth - 80,
       x = display.contentWidth/2 + 30,
-      y = button1.y + display.contentHeight/8.4
+      y = button1.y + display.contentHeight/8.4,
+	  fontSize = 14
     }
   )
-  bg1 = display.newRect( button1.x, button1.y - 20, display.contentWidth, button1.height + 10 )
+  bg1 = display.newRect( button1.x, button1.y - 10, display.contentWidth + 40, button1.height - 10 )
   bg1:setFillColor(1,1,1)
-  bg2 = display.newRect( button2.x - 10, button2.y - 20, button2.width + 20, button2.height + 10 )
+  bg2 = display.newRect( button2.x , button2.y - 12.25, button2.width + 50, button1.height - 10 )
   bg2:setFillColor(1,1,1)
   button1:setFillColor(black)
   button2:setFillColor(black)
-  starIcon = display.newImage("star.png")
-  starIcon.isVisible = false
-  favourite = addButton( "favourite", display.contentWidth - 20, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
+  starIcon = display.newImage("star.png", button1.x + 120, button1.y - 20)
+  starIcon:scale(0.05, 0.05)
+  favourite = addButton( "favourite".. row.id , button1.x + 120, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
+  arrowImage = display.newImage("arrow-down-and-right.png", button1.x - 105, button1.y + 30 )
+  binIcon = display.newImage("recycle-bin.png", button1.x + 160, button1.y - 20)
+  binIcon:scale (0.75, 0.75)
+  bin = addButton( "bin".. row.id , button1.x + 160, button1.y - 20, 25, 25, "icon", binIcon ) --( ID, x, y, width, height, btnType, label )
   scroll:insert(bg1)
   scroll:insert(button1)
   scroll:insert(bg2)
   scroll:insert(button2)
+  scroll:insert(starIcon)
   scroll:insert(favourite)
+  scroll:insert(arrowImage)
+  scroll:insert(binIcon)
+  scroll:insert(bin)
+  
   table.insert(currentButtons, button1)
   table.insert(currentButtons, bg1)
   table.insert(currentButtons, button2)
   table.insert(currentButtons, bg2)
+  table.insert(currentButtons, starIcon)
+  table.insert(currentButtons, arrowImage)
   table.insert(currentButtons, favourite)
+  table.insert(currentButtons, binIcon)
+  table.insert(currentButtons, bin)
 end
 
 function populatePhrases( scroll, search, phraseType )
@@ -957,10 +993,15 @@ phrasesGroup:insert(phraseText)
 phrasesGroup:insert(addPhraseButton)
 
 -- User profile
-function addProfileToScroll(scroll, userDetailType, userContact, num)
+function addProfileToScroll(scroll, userDetailType, contact, num)
+  if contact ~= nil then
+    printLabel = userDetailType .. "\n" .. contact
+  else
+    printLabel = userDetailType .. "\nNot supplied" 
+  end
   button = widget.newButton(
     {
-      label = userContact .. "\n" .. userDetailType,
+      label = printLabel,
       labelAlign = "left",
       labelXOffset = 160,
       shape = "roundedRect",
@@ -973,55 +1014,33 @@ function addProfileToScroll(scroll, userDetailType, userContact, num)
       y = (num * 53) + 30
     }
   )
+  button:toFront()
   scroll:insert(button)
   table.insert(currentButtons, button)
 end
 
-function populateProfile ( scroll )
-  query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
-  for row in db:nrows(query) do
-  	userImg = row.userpic
+function populateProfile ( profileType, profileId, scroll )
+  if profileType == "user" then
+    query = [[SELECT * FROM user WHERE userid=]] .. profileId
+  else
+    query = [[SELECT * FROM lawyer WHERE id=]] .. profileId
   end
-  profileImg = display.newImage(userImg ,display.contentWidth/2, display.contentHeight/4)
-  scroll:insert(profileImg)
-  table.insert(currentButtons, profileImg)
-
-  query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
   for row in db:nrows(query) do
-  button = widget.newButton(
-    {
-      label = row.name,
-      shape = "rect",
-      labelAlign = "left",
-      labelColor = { default={ 0, 0, 0 },},
-      fontSize = 34,
-      height = display.contentHeight/9,
-      width = display.contentWidth,
-      x = display.contentWidth/2,
-      y = 189
-    }
-  )
-  scroll:insert(button)
-  table.insert(currentButtons, button)
+    userImg = row.userpic
+    if userImg ~= nil then 
+      profileImg = display.newImage(userImg, display.contentWidth/2, display.contentHeight/4)
+      scroll:insert(profileImg)
+    else
+      print(userImg)
+    end
+    addProfileToScroll(scroll, "Name", row.name, 2)
+    addProfileToScroll(scroll, "Mobile", row.mobilenum, 4)
+    addProfileToScroll(scroll, "Work", row.worknum, 5)
+    addProfileToScroll(scroll, "E-mail", row.email, 6)
+    scroll:insert(button)
   end
-  query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
-  local i = 4
-  for row in db:nrows(query) do
-    while (i == 4) do
-      addProfileToScroll(scroll, "Mobile", row.mobilenum, i)
-      i = i + 1
-    end
-    while (i == 5) do
-      addProfileToScroll(scroll, "Work", row.worknum, i)
-      i = i + 1
-    end
-    while (i == 6) do
-      addProfileToScroll(scroll, "E-mail", row.email, i)
-      i = nil
-    end
-  end
+  table.insert(currentButtons, scroll)
 end
-profileScroll = getScroll( "profile" )
 
 -- Current Country display group (inc button)
 
@@ -1202,8 +1221,9 @@ hideButtons(countryButtons)
 hideButtons(phraseMenuButtons)
 hideButtons(menuBarButtons)
 hideButtons(localLawyerButtons)
-showButtons(loginButtons)
 hideButtons(mainMenuButtons)
 hideButtons(registrationButtons)
 hideButtons(addPhraseButtons)
 hideButtons(contactsButtons)
+hideButtons(profileButtons)
+showButtons(loginButtons)
