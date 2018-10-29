@@ -917,14 +917,12 @@ function addPhraseToScroll(scroll, row, num)
   button1:setFillColor(black)
   button2:setFillColor(black)
   starIcon = display.newImage("star.png", button1.x + 120, button1.y - 20)
-      starIcon:scale(0.05, 0.05)
-  	  favourite = addButton( "favourite".. row.id , button1.x + 120, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
-  
+  starIcon:scale(0.05, 0.05)
+  favourite = addButton( "favourite".. row.id , button1.x + 120, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
   arrowImage = display.newImage("arrow-down-and-right.png", button1.x - 105, button1.y + 30 )
-  
   binIcon = display.newImage("recycle-bin.png", button1.x + 160, button1.y - 20)
-		binIcon:scale (0.75, 0.75)
-		bin = addButton( "bin".. row.id , button1.x + 160, button1.y - 20, 25, 25, "icon", binIcon ) --( ID, x, y, width, height, btnType, label )
+  binIcon:scale (0.75, 0.75)
+  bin = addButton( "bin".. row.id , button1.x + 160, button1.y - 20, 25, 25, "icon", binIcon ) --( ID, x, y, width, height, btnType, label )
   scroll:insert(bg1)
   scroll:insert(button1)
   scroll:insert(bg2)
@@ -1016,21 +1014,21 @@ function populateProfile ( scroll )
 
   query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
   for row in db:nrows(query) do
-  button = widget.newButton(
-    {
-      label = row.name,
-      shape = "rect",
-      labelAlign = "left",
-      labelColor = { default={ 0, 0, 0 },},
-      fontSize = 34,
-      height = display.contentHeight/9,
-      width = display.contentWidth,
-      x = display.contentWidth/2,
-      y = 189
-    }
-  )
-  scroll:insert(button)
-  table.insert(currentButtons, button)
+    button = widget.newButton(
+      {
+        label = row.name,
+        shape = "rect",
+        labelAlign = "left",
+        labelColor = { default={ 0, 0, 0 },},
+        fontSize = 34,
+        height = display.contentHeight/9,
+        width = display.contentWidth,
+        x = display.contentWidth/2,
+        y = 189
+      }
+    )
+    scroll:insert(button)
+    table.insert(currentButtons, button)
   end
   query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
   local i = 4
@@ -1230,8 +1228,9 @@ hideButtons(countryButtons)
 hideButtons(phraseMenuButtons)
 hideButtons(menuBarButtons)
 hideButtons(localLawyerButtons)
-showButtons(loginButtons)
 hideButtons(mainMenuButtons)
 hideButtons(registrationButtons)
 hideButtons(addPhraseButtons)
 hideButtons(contactsButtons)
+hideButtons(profileButtons)
+showButtons(loginButtons)
