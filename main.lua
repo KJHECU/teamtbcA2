@@ -19,6 +19,7 @@ local db = sqlite3.open( path )
 local currentCountryId = 1
 local currentCountry = "Australia"
 local userType = 0
+local currentUserId
 local radioPhraseType = 0
 
 local loginForm = true
@@ -50,9 +51,11 @@ local function handleInput( event )
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
   elseif id == 3 then
-    hideButtons(mainMenuButtons)
+    profileScroll = getScroll( "profile" )
+    hideButtons(currentButtons)
     showButtons(profileButtons)
-    populateProfile(profileScroll)
+    showButtons(menuBarButtons)
+    populateProfile("user", currentUserId, profileScroll)
     profileScroll.isVisible = true
   elseif id == 4 then
     hideButtons(currentButtons)
@@ -94,7 +97,7 @@ local function handleInput( event )
     phraseScroll.isVisible = true
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
-	if userType == 1 then
+    if userType == 1 then
 		 addPhraseButton.isVisible = true
 		else
 		 addPhraseButton.isVisible = false
@@ -173,6 +176,13 @@ local function handleInput( event )
     hideButtons(currentButtons)
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
+  elseif string.starts(id, "lawyer") then
+    profileScroll = getScroll( "profile" )
+    hideButtons(currentButtons)
+    showButtons(profileButtons)
+    showButtons(menuBarButtons)
+    populateProfile("lawyer", id:sub(7), profileScroll)
+    profileScroll.isVisible = true
   end
 end
 
@@ -351,7 +361,7 @@ end
 -- function which checks for empty input fields
 function deletePhrase(id)
 	 phraseID = string.sub( id, 4 )
-	 query = [[DELETE FROM phrase WHERE id=]] .. phraseID .. [[]]
+	 query = [[DELETE FROM phrase WHERE id=]] .. phraseID
 	 db:exec(query)
 	 print(query)
 end
@@ -983,10 +993,15 @@ phrasesGroup:insert(phraseText)
 phrasesGroup:insert(addPhraseButton)
 
 -- User profile
-function addProfileToScroll(scroll, userDetailType, userContact, num)
+function addProfileToScroll(scroll, userDetailType, contact, num)
+  if contact ~= nil then
+    printLabel = userDetailType .. "\n" .. contact
+  else
+    printLabel = userDetailType .. "\nNot supplied" 
+  end
   button = widget.newButton(
     {
-      label = userContact .. "\n" .. userDetailType,
+      label = printLabel,
       labelAlign = "left",
       labelXOffset = 160,
       shape = "roundedRect",
@@ -999,55 +1014,33 @@ function addProfileToScroll(scroll, userDetailType, userContact, num)
       y = (num * 53) + 30
     }
   )
+  button:toFront()
   scroll:insert(button)
   table.insert(currentButtons, button)
 end
 
-function populateProfile ( scroll )
-  query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
-  for row in db:nrows(query) do
-  	userImg = row.userpic
+function populateProfile ( profileType, profileId, scroll )
+  if profileType == "user" then
+    query = [[SELECT * FROM user WHERE userid=]] .. profileId
+  else
+    query = [[SELECT * FROM lawyer WHERE id=]] .. profileId
   end
-  profileImg = display.newImage(userImg ,display.contentWidth/2, display.contentHeight/4)
-  scroll:insert(profileImg)
-  table.insert(currentButtons, profileImg)
-
-  query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
   for row in db:nrows(query) do
-    button = widget.newButton(
-      {
-        label = row.name,
-        shape = "rect",
-        labelAlign = "left",
-        labelColor = { default={ 0, 0, 0 },},
-        fontSize = 34,
-        height = display.contentHeight/9,
-        width = display.contentWidth,
-        x = display.contentWidth/2,
-        y = 189
-      }
-    )
+    userImg = row.userpic
+    if userImg ~= nil then 
+      profileImg = display.newImage(userImg, display.contentWidth/2, display.contentHeight/4)
+      scroll:insert(profileImg)
+    else
+      print(userImg)
+    end
+    addProfileToScroll(scroll, "Name", row.name, 2)
+    addProfileToScroll(scroll, "Mobile", row.mobilenum, 4)
+    addProfileToScroll(scroll, "Work", row.worknum, 5)
+    addProfileToScroll(scroll, "E-mail", row.email, 6)
     scroll:insert(button)
-    table.insert(currentButtons, button)
   end
-  query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
-  local i = 4
-  for row in db:nrows(query) do
-    while (i == 4) do
-      addProfileToScroll(scroll, "Mobile", row.mobilenum, i)
-      i = i + 1
-    end
-    while (i == 5) do
-      addProfileToScroll(scroll, "Work", row.worknum, i)
-      i = i + 1
-    end
-    while (i == 6) do
-      addProfileToScroll(scroll, "E-mail", row.email, i)
-      i = nil
-    end
-  end
+  table.insert(currentButtons, scroll)
 end
-profileScroll = getScroll( "profile" )
 
 -- Current Country display group (inc button)
 
