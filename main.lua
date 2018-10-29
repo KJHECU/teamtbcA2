@@ -4,7 +4,8 @@
 --
 -----------------------------------------------------------------------------------------
 -- required for unit tests
-require "lunit"
+require "lunatest"
+
 
 -- background image properties
 
@@ -675,4 +676,6 @@ showButtons(loginButtons)
 hideButtons(mainMenuButtons)
 hideButtons(registrationButtons)
 
-lunit.run("unit_tests")
+lunatest.suite("unit_tests")
+
+lunatest.run()
