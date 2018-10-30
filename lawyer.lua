@@ -1,3 +1,9 @@
+----------------------------------------------------------------------------------------
+--
+-- lawyer.lua
+--
+-----------------------------------------------------------------------------------------
+
 actionListener = require("actionListener")
 
 ------- add local lawyer fields
@@ -58,17 +64,19 @@ inputaddLawyerMobile.inputType = "default"
 inputaddLawyerMobile.placeholder = "-- insert mobile --"
 inputaddLawyerMobile.font = native.newFont(native.systemFont, 12)
 
+-- add Lawyer button
 addLawyerButton = display.newImage("addButton.png")
  addLawyerButton:scale(0.5,0.5)
  addLawyerButton.y = display.contentHeight/5.5
  addLawyerButton.x = display.contentWidth/1.125
  addLawyerButton.isVisible = false
- 
+
 lawyerScroll = getScroll( "lawyer" )
 lawyerSearch = native.newTextField(display.contentWidth/2,display.contentHeight/5.5,0.5*display.contentWidth,26)
 lawyerSearch.placeholder = "Search Lawyer"
 lawyerSearch.id = "lawyerId"
  
+-- Listener for when text is entered into lawyer seach bar
 function searchListenerLaw( event )
   if ( event.phase == "ended" or event.phase == "submitted" ) then
     lawyerScroll:removeSelf()

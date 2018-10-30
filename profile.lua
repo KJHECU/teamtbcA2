@@ -1,3 +1,10 @@
+----------------------------------------------------------------------------------------
+--
+-- profile.lua
+--
+-----------------------------------------------------------------------------------------
+
+-- Adds profile information to profile display scroll
 function addProfileToScroll(scroll, userDetailType, contact, num)
   if contact ~= nil then
     printLabel = userDetailType .. "\n" .. contact
@@ -24,6 +31,7 @@ function addProfileToScroll(scroll, userDetailType, contact, num)
   table.insert(currentButtons, button)
 end
 
+-- Pulls profile data from db
 function populateProfile ( profileType, profileId, scroll )
   if profileType == "user" then
     query = [[SELECT * FROM user WHERE userid=]] .. profileId

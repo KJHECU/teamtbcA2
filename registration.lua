@@ -1,3 +1,9 @@
+----------------------------------------------------------------------------------------
+--
+-- registration.lua
+--
+-----------------------------------------------------------------------------------------
+
 ------- registration fields
 -- registration label
 backRegistration = display.newRect(display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15)

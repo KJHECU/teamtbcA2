@@ -1,3 +1,9 @@
+----------------------------------------------------------------------------------------
+--
+-- phrase.lua
+--
+-----------------------------------------------------------------------------------------
+
 widget = require( "widget" )
 buttonCreator = require("buttonCreator")
 scrollCreator = require("scrollCreator")
@@ -5,6 +11,7 @@ user = require("user")
 
 radioPhraseType = 0
 
+-- Button to add phrase to db & list
 addPhraseButton = display.newImage("addButton.png")
  addPhraseButton:scale(0.5,0.5)
  addPhraseButton.y = display.contentHeight/5.8
@@ -95,7 +102,6 @@ function addPhraseToScroll(scroll, row, num)
   scroll:insert(arrowImage)
   scroll:insert(binPhraseIcon)
   scroll:insert(binPhrase)
-  
   table.insert(currentButtons, button1)
   table.insert(currentButtons, bg1)
   table.insert(currentButtons, button2)
@@ -112,6 +118,7 @@ backradioPhrase:setFillColor (0, 0.8, 0.8)
 txtaddUsefulPhrase = display.newText( "Useful", display.contentWidth/1.375, display.contentHeight/2.425, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
 txtaddLegalPhrase = display.newText( "Legal", display.contentWidth/0.925, display.contentHeight/2.425, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
 
+-- Listener for radio button distinguishing between entered phrase type
 function onSwitchPress( event )
   local switch = event.target
   radioPhraseType = event.target.id
@@ -146,6 +153,7 @@ radioPhraseGroup:insert( txtaddLegalPhrase )
 radioPhraseGroup:insert( radioLegalPhrase )
 radioPhraseGroup:insert( radioUsefulPhrase )
 
+-- Populates phrase list from db
 function populatePhrases( scroll, search, phraseType )
   if search == nil then
     query = [[SELECT * FROM phrase WHERE countryid=]] .. currentCountryId .. [[ AND phrasetype=]] .. phraseType

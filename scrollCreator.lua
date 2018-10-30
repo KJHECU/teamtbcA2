@@ -1,5 +1,12 @@
+----------------------------------------------------------------------------------------
+--
+-- scrollCreator.lua
+--
+-----------------------------------------------------------------------------------------
+
 user = require("user")
 
+-- Creates scroll pane to contain display objects
 function getScroll(scrollType)
   scroll = widget.newScrollView(
   {
@@ -45,6 +52,7 @@ function addContactsToScroll(scroll, contactType, contactNum, num)
   table.insert(currentButtons, button)
 end
 
+-- Pulls information from db necessary for filling scroll pane
 function populateScroll( scroll, search )
   order = false
   if scroll == lawyerScroll then
@@ -69,6 +77,7 @@ function populateScroll( scroll, search )
   end
 end
 
+-- Pulls contact details from db for contact display scroll
 function populateContacts ( scroll )
   contactType = nil
   query = [[SELECT * FROM country WHERE id=]] .. currentCountryId

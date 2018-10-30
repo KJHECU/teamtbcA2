@@ -1,8 +1,15 @@
+----------------------------------------------------------------------------------------
+--
+-- buttonCreator.lua
+--
+-----------------------------------------------------------------------------------------
+
 local widget = require("widget")
 
 buttonFillColor = { default={0, 0.8, 0.8, 1 }, over={0, 0.8, 0.8, 1} }
 buttonStrokeFillColor = { default={0,0.8,0.8}, over={0.8,0.8,1,1} }
--- utility to make buttons
+
+-- Utility to make buttons
 function addButton( ID, x, y, width, height, btnType, label )
   if btnType == "icon" then
     button = widget.newButton(
@@ -13,7 +20,6 @@ function addButton( ID, x, y, width, height, btnType, label )
           height = height
         }
       )
-
   elseif btnType == "panic" then
     button = widget.newButton(
         {
@@ -85,6 +91,7 @@ function addButton( ID, x, y, width, height, btnType, label )
 	return button
 end
 
+-- Utility to add buttons to a scroll pane
 function addButtonToScroll(scroll, row, num)
   button = widget.newButton(
     {
@@ -103,21 +110,16 @@ function addButtonToScroll(scroll, row, num)
       onRelease = handleInput
     }
   )
-  
   if scroll == lawyerScroll then
-
-	scroll:insert(button)
-	table.insert(currentButtons, button)
-	
-	binLawyerIcon = display.newImage("recycle-bin.png", button.x + 120, button.y )
-	binLawyerIcon:scale (0.75, 0.75)
-	binLawyer = addButton( "binLawyer".. row.id , button.x + 120, button.y , 25, 25, "icon", binLawyerIcon ) --( ID, x, y, width, height, btnType, label )
-	
-	scroll:insert(binLawyerIcon)
-	scroll:insert(binLawyer)
-	table.insert(currentButtons, binLawyerIcon)
-	table.insert(currentButtons, binLawyer)
-		
+    scroll:insert(button)
+    table.insert(currentButtons, button)
+    binLawyerIcon = display.newImage("recycle-bin.png", button.x + 120, button.y )
+    binLawyerIcon:scale (0.75, 0.75)
+    binLawyer = addButton( "binLawyer".. row.id , button.x + 120, button.y , 25, 25, "icon", binLawyerIcon ) --( ID, x, y, width, height, btnType, label )
+    scroll:insert(binLawyerIcon)
+    scroll:insert(binLawyer)
+    table.insert(currentButtons, binLawyerIcon)
+    table.insert(currentButtons, binLawyer)
   else
 	  scroll:insert(button)
 	  table.insert(currentButtons, button)

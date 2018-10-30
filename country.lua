@@ -1,5 +1,10 @@
--- Current Country display group (inc button)
+----------------------------------------------------------------------------------------
+--
+-- country.lua
+--
+-----------------------------------------------------------------------------------------
 
+-- Create and populate country select display group
 countryGroup = display.newGroup()
 
 globe = display.newImage("globe.png" ,display.contentWidth/5, display.contentHeight/10)
@@ -19,6 +24,7 @@ countrySearch = native.newTextField(display.contentWidth/2,display.contentHeight
 countrySearch.placeholder = "Search Country"
 countrySearch.id = "countryId"
 
+-- Listener for when text is entered into country search bar
 function searchListenerCountry( event )
   if ( event.phase == "ended" or event.phase == "submitted" ) then
     countryScroll:removeSelf()

@@ -1,3 +1,10 @@
+----------------------------------------------------------------------------------------
+--
+-- actionListener.lua
+--
+-----------------------------------------------------------------------------------------
+
+-- Listener for button presses
 function handleInput( event )
   id = event.target.id
   print("button push " .. id)

@@ -1,3 +1,10 @@
+----------------------------------------------------------------------------------------
+--
+-- user.lua
+--
+-----------------------------------------------------------------------------------------
+
+-- Holds session-specific data for other sections to reference
 currentCountryId = 1
 currentCountry = "Australia"
 userType = 0

@@ -1,4 +1,8 @@
--- login feature which is enabled by default --
+----------------------------------------------------------------------------------------
+--
+-- login.lua
+--
+-----------------------------------------------------------------------------------------
 
 -- login username capture
 backLoadEmail = display.newRect(display.contentWidth/2, display.contentHeight/6.65, display.contentWidth, display.contentHeight/15)

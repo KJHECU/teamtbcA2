@@ -39,17 +39,21 @@ function isEmpty(field)
 		return false
 	end
 end
-
+-- Icon for home button
 homeButton = display.newImage("home_white_192x192.png")
   homeButton:scale(0.22, 0.22)
   homeButton.y = display.contentHeight + 10
   homeButton.x = 9.3*display.contentWidth/10
-
+-- Icon for user profile button
 panicSettingsButton = display.newImage("User-Profile.png")
   panicSettingsButton:scale(0.12, 0.12)
   panicSettingsButton.y = display.contentHeight + 10
   panicSettingsButton.x = 7.75*display.contentWidth/10
-
+----------------------------------------------------------------------------------------
+--
+-- All screen sections broken into arrays of elements for simple hiding/showing when needed
+--
+-----------------------------------------------------------------------------------------
 menuBarButtons = {
     addButton( 1, display.contentWidth/2, display.contentHeight + 10, 130, 38, "panic", 'Panic Button'),
     addButton( 2, homeButton.x, homeButton.y, homeButton.width*0.22, homeButton.height*0.22, "icon", homeButton ),
@@ -193,13 +197,14 @@ addPhraseButtons = {
 		radioPhraseGroup
 }
 
+-- Displays all display elements passed to function
 function showButtons(buttons)
     for _, button in pairs(buttons) do
       button.isVisible = true
       table.insert(currentButtons, button)
     end
 end
-
+-- Hides all display elements passed to function
 function hideButtons(buttons)
     for _, button in pairs(buttons) do
       button.isVisible = false
@@ -207,6 +212,7 @@ function hideButtons(buttons)
     currentButtons = {}
 end
 
+--Hide all buttons except login on app boot
 hideButtons(addLawyerButtons)
 hideButtons(phraseButtons)
 hideButtons(countryButtons)
