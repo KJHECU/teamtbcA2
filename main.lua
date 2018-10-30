@@ -11,6 +11,7 @@ background.anchorX = 0
 background.anchorY = 0
 background:scale(0.45, 0.72)
 
+local reg = require( "registration.lua" )
 local widget = require( "widget" )
 local sqlite3 = require( "sqlite3" )
 local path = system.pathForFile( "data.db", system.ResourceDirectory )
@@ -19,6 +20,8 @@ local db = sqlite3.open( path )
 local currentCountryId = 1
 local currentCountry = "Australia"
 local userType = 0
+local currentUserId
+local radioPhraseType = 0
 
 local loginForm = true
 local regForm = true
@@ -43,11 +46,18 @@ local buttonStrokeFillColor = { default={0,0.8,0.8}, over={0.8,0.8,1,1} }
 local function handleInput( event )
   id = event.target.id
   print("button push " .. id)
-  if id == 2 then
+  if id == 2 then 					
     hideButtons(currentButtons)
     hideButtons(phraseButtons)
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
+  elseif id == 3 then
+    profileScroll = getScroll( "profile" )
+    hideButtons(currentButtons)
+    showButtons(profileButtons)
+    showButtons(menuBarButtons)
+    populateProfile("user", currentUserId, profileScroll)
+    profileScroll.isVisible = true
   elseif id == 4 then
     hideButtons(currentButtons)
     populateScroll(lawyerScroll, nil)
@@ -76,6 +86,11 @@ local function handleInput( event )
     phraseScroll.isVisible = true
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
+	if userType == 1 then
+		 addPhraseButton.isVisible = true
+		else
+		 addPhraseButton.isVisible = false
+		end
   elseif id == 8 then
     hideButtons(phraseMenuButtons)
     phraseText.text = "Legal Phrases"
@@ -83,6 +98,11 @@ local function handleInput( event )
     phraseScroll.isVisible = true
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
+    if userType == 1 then
+		 addPhraseButton.isVisible = true
+		else
+		 addPhraseButton.isVisible = false
+		end
   elseif id == 10 then
     if loginAccepted() then
       hideButtons(loginButtons)
@@ -120,6 +140,32 @@ local function handleInput( event )
     lawyerScroll.isVisible = true
     showButtons(localLawyerButtons)
     showButtons(menuBarButtons)
+  elseif id == 17 then
+  if userType == 1 then
+    hideButtons(currentButtons)
+    showButtons(addPhraseButtons)
+  end 
+  elseif id == 18 then
+    if addPhraseValid() then
+     addNewPhrase()
+	 hideButtons(currentButtons)
+     showButtons(phraseMenuButtons)
+  end  
+  elseif id == 19 then
+    hideButtons(currentButtons)
+    showButtons(phraseMenuButtons)
+	showButtons(menuBarButtons)
+  elseif string.starts(id,"binPhrase") then
+    deletePhrase(id)
+	hideButtons(currentButtons)
+    showButtons(phraseMenuButtons)
+	showButtons(menuBarButtons)
+  elseif string.starts(id,"binLawyer") then
+	print("hitting this")
+    deleteLawyer(id)
+	hideButtons(currentButtons)
+    showButtons(phraseMenuButtons)
+	showButtons(menuBarButtons)
   elseif id == 99 then
     hideButtons(currentButtons)
     populateScroll(countryScroll, nil)
@@ -132,11 +178,18 @@ local function handleInput( event )
     for row in db:nrows([[SELECT name FROM country WHERE id=]] .. currentCountryId) do
       countrySelectButton:setLabel("Current Country: " .. row.name)
       currentCountry = row.name
-      txtaddLawyerCountry.text = "Current Country: "..currentCountry
+      txtstaticCountry.text = "Current Country: "..currentCountry
     end
     hideButtons(currentButtons)
     showButtons(mainMenuButtons)
     showButtons(menuBarButtons)
+  elseif string.starts(id, "lawyer") then
+    profileScroll = getScroll( "profile" )
+    hideButtons(currentButtons)
+    showButtons(profileButtons)
+    showButtons(menuBarButtons)
+    populateProfile("lawyer", id:sub(7), profileScroll)
+    profileScroll.isVisible = true
   end
 end
 
@@ -146,7 +199,6 @@ local function onRegister(event)
 	if (event.action == "clicked") then
 		local i = event.index
 		if (i ==  1) then
-
 		end
 	end
 end
@@ -171,6 +223,7 @@ local function searchListenerCountry( event )
   end
 end
 
+-- function validating registration form
 function regFormValid()
   regForm = true
   if isEmpty(inputRegEmail) then
@@ -212,6 +265,7 @@ function regFormValid()
   return regForm
 end
 
+-- function validating add Lawyer form
 function addLawyerValid()
   addLawyerForm = true
   if isEmpty(inputaddLawyerEmail) then
@@ -233,7 +287,22 @@ function addLawyerValid()
   return addLawyerForm
 end
 
--- function which handles the registration of new users
+-- function validating add Phrase form
+function addPhraseValid()
+  addPhraseForm = true
+  if isEmpty(inputaddPhraseEnglish) then
+    inputaddPhraseEnglish.placeholder = "English phrase not provided"
+    addPhraseForm = false
+  end
+  if isEmpty(inputaddPhraseTrans) then
+    inputaddPhraseTrans.placeholder = "Translated phrase not provided"
+    addPhraseForm = false
+  end
+  return addPhraseForm
+end
+
+
+-- function which handles the registration of new users (INSERT)
 function submitRegistration()
   query = [[INSERT INTO user (email, password, name, mobilenum, nokemail, nokname, nokmobile) VALUES ("]]
     .. inputRegEmail.text .. [[", "]] .. inputRegPassword.text .. [[", "]] .. inputFname.text .. " " .. inputSname.text
@@ -242,12 +311,21 @@ function submitRegistration()
   db:exec(query)
 end
 
--- function which handles the addition of new laywers
+-- function which handles the addition of new laywers (INSERT)
 function addNewLawyer()
   query = [[INSERT INTO lawyer (email, name, mobilenum, countryid) VALUES ("]]
     .. inputaddLawyerEmail.text .. [[", "]] .. inputaddLawyerFname.text .. " " .. inputaddLawyerSname.text .. [[", "]] .. inputaddLawyerMobile.text .. [[", "]] .. currentCountryId ..[[");]]
   db:exec(query)
 end
+
+-- function which handles the addition of new phrases (INSERT)
+function addNewPhrase()
+  query = [[INSERT INTO phrase (english, translated, countryid, phrasetype) VALUES ("]]
+    .. inputaddPhraseEnglish.text .. [[", "]] .. inputaddPhraseTrans.text .. [[", "]] .. currentCountryId .. [[", "]] .. radioPhraseType .. [[");]]
+  db:exec(query)
+  print(query)
+end
+
 
 -- function which handles login
 function loginAccepted()
@@ -285,6 +363,22 @@ function isEmpty(field)
 	else
 		return false
 	end
+end
+
+-- function which deletes phrases
+function deletePhrase(id)
+	 phraseID = string.sub( id, 10 )
+	 query = [[DELETE FROM phrase WHERE id=]] .. phraseID
+	 db:exec(query)
+	 print(query)
+end
+
+-- function which deletes lawyers
+function deleteLawyer(id)
+	 lawyerID = string.sub( id, 10 )
+	 query = [[DELETE FROM lawyer WHERE id=]] .. lawyerID
+	 db:exec(query)
+	 print(query)
 end
 
 
@@ -341,6 +435,16 @@ local function addButton( ID, x, y, width, height, btnType, label )
           height = height,
 		}
       )
+  elseif btnType == "phraseAdd" then
+    button = widget.newButton(
+        {
+          default = label,
+          onRelease = handleInput,
+          width = width,
+          height = height,
+		}
+      )
+
  else
     button = widget.newButton(
         {
@@ -379,6 +483,12 @@ addLawyerButton = display.newImage("addButton.png")
  addLawyerButton.y = display.contentHeight/5.5
  addLawyerButton.x = display.contentWidth/1.125
  addLawyerButton.isVisible = false
+ 
+addPhraseButton = display.newImage("addButton.png")
+ addPhraseButton:scale(0.5,0.5)
+ addPhraseButton.y = display.contentHeight/5.8
+ addPhraseButton.x = display.contentWidth/1.125
+ addPhraseButton.isVisible = false
  
 
 -- login feature which is enabled by default --
@@ -594,12 +704,89 @@ inputaddLawyerMobile.inputType = "default"
 inputaddLawyerMobile.placeholder = "-- insert mobile --"
 inputaddLawyerMobile.font = native.newFont(native.systemFont, 12)
 
--- add Lawyer Country
-backaddLawyerCountry= display.newRect(display.contentWidth/2, display.contentHeight/2.1, display.contentWidth, display.contentHeight/15)
-backaddLawyerCountry:setFillColor (0, 0.8, 0.8)
-txtaddLawyerCountry = display.newText("Current Country: "..currentCountry, display.contentWidth/1.4, display.contentHeight/2.05, display.contentWidth, display.contentHeight/15)
-txtaddLawyerCountry:setTextColor(1,1,1)
-txtaddLawyerCountry.font = native.newFont(native.systemFont, 12)
+------- add phrase fields
+
+-- add Phrase heading
+backaddPhrase = display.newRect(display.contentWidth/2, display.contentHeight/15, display.contentWidth, display.contentHeight/15)
+backaddPhrase:setFillColor (0, 0.8, 0.8)
+txtaddPhrase= display.newText("ADD PHRASE", display.contentWidth/3.3, display.contentHeight/13.5, display.contentWidth, display.contentHeight/15, native.systemFont, 16)
+txtaddPhrase:setFillColor (1,1,1 )
+txtaddPhrase.x = display.contentWidth/1.25
+txtaddPhrase.y = display.contentHeight/12.5
+
+-- add Phrase English
+backaddPhraseEnglish = display.newRect(display.contentWidth/2, display.contentHeight/6.1, display.contentWidth, display.contentHeight/15)
+backaddPhraseEnglish :setFillColor (0, 0.8, 0.8)
+inputaddPhraseEnglish  = native.newTextField(0,0,200,30)
+txtaddPhraseEnglish  = display.newText( "English",display.contentWidth/0.84, display.contentHeight/5.6, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+inputaddPhraseEnglish.x = display.contentWidth/2.9
+inputaddPhraseEnglish.y = display.contentHeight/6.2
+inputaddPhraseEnglish:setTextColor(0,0,0)
+inputaddPhraseEnglish.inputType = "default"
+inputaddPhraseEnglish.placeholder = "-- insert english phrase--"
+inputaddPhraseEnglish.font = native.newFont(native.systemFont, 12)
+
+-- add Phrase Translation
+backaddPhraseTrans = display.newRect(display.contentWidth/2, display.contentHeight/4.1, display.contentWidth, display.contentHeight/15)
+backaddPhraseTrans:setFillColor (0, 0.8, 0.8)
+inputaddPhraseTrans = native.newTextField(0,0,200,30)
+txtaddPhraseTrans = display.newText( "Translation", display.contentWidth/0.84, display.contentHeight/3.9, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+inputaddPhraseTrans.x = display.contentWidth/2.9
+inputaddPhraseTrans.y = display.contentHeight/4.05
+inputaddPhraseTrans:setTextColor(0,0,0)
+inputaddPhraseTrans.inputType = "default"
+inputaddPhraseTrans.placeholder = "-- insert phrase translation --"
+inputaddPhraseTrans.font = native.newFont(native.systemFont, 12)
+
+-- static Country 
+backstaticCountry= display.newRect(display.contentWidth/2, display.contentHeight/2.1, display.contentWidth, display.contentHeight/15)
+backstaticCountry:setFillColor (0, 0.8, 0.8)
+txtstaticCountry = display.newText("Current Country: "..currentCountry, display.contentWidth/1.4, display.contentHeight/2.05, display.contentWidth, display.contentHeight/15)
+txtstaticCountry:setTextColor(1,1,1)
+txtstaticCountry.font = native.newFont(native.systemFont, 10)
+
+-- Handle press events for add Phrase radio buttons
+local function onSwitchPress( event )
+    local switch = event.target
+	radioPhraseType = event.target.id
+	print (radioPhraseType)
+end
+ 
+-- Create a group for the radio button set
+local radioPhraseGroup = display.newGroup()
+ 
+backradioPhrase = display.newRect(display.contentWidth/2, display.contentHeight/2.5, display.contentWidth, display.contentHeight/15)
+backradioPhrase:setFillColor (0, 0.8, 0.8) 
+txtaddUsefulPhrase = display.newText( "Useful", display.contentWidth/1.375, display.contentHeight/2.425, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+txtaddLegalPhrase = display.newText( "Legal", display.contentWidth/0.925, display.contentHeight/2.425, display.contentWidth, display.contentHeight/15, native.systemFont, 15 )
+
+radioPhraseGroup:insert( backradioPhrase )
+radioPhraseGroup:insert( txtaddUsefulPhrase )
+radioPhraseGroup:insert( txtaddLegalPhrase )
+
+-- Create two associated radio buttons (inserted into the same display group)
+local radioUsefulPhrase = widget.newSwitch(
+    {
+        left = 120,
+        top = 175,
+        style = "radio",
+        id = "0",
+        initialSwitchState = true,
+        onPress = onSwitchPress,
+    }
+)
+radioPhraseGroup:insert( radioUsefulPhrase )
+ 
+local radioLegalPhrase = widget.newSwitch(
+    {
+        left = 225,
+        top = 175,
+        style = "radio",
+        id = "1",
+        onPress = onSwitchPress
+    }
+)
+radioPhraseGroup:insert( radioLegalPhrase )
 
 -- scroll pane for local lawyer & country lists
 
@@ -639,8 +826,25 @@ function addButtonToScroll(scroll, row, num)
       onRelease = handleInput
     }
   )
-  scroll:insert(button)
-  table.insert(currentButtons, button)
+  
+  if scroll == lawyerScroll then
+
+	scroll:insert(button)
+	table.insert(currentButtons, button)
+	
+	binLawyerIcon = display.newImage("recycle-bin.png", button.x + 120, button.y )
+	binLawyerIcon:scale (0.75, 0.75)
+	binLawyer = addButton( "binLawyer".. row.id , button.x + 120, button.y , 25, 25, "icon", binLawyerIcon ) --( ID, x, y, width, height, btnType, label )
+	
+	scroll:insert(binLawyerIcon)
+	scroll:insert(binLawyer)
+	table.insert(currentButtons, binLawyerIcon)
+	table.insert(currentButtons, binLawyer)
+		
+  else
+	  scroll:insert(button)
+	  table.insert(currentButtons, button)
+  end
 end
 
 lawyerScroll = getScroll( "lawyer" )
@@ -650,7 +854,7 @@ lawyerSearch.id = "lawyerId"
 lawyerSearch:addEventListener("userInput", searchListenerLaw)
 
 countryScroll = getScroll( "country" )
-countrySearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,50)
+countrySearch = native.newTextField(display.contentWidth/2,display.contentHeight/12,0.9*display.contentWidth,26)
 countrySearch.placeholder = "Search Country"
 countrySearch.id = "countryId"
 countrySearch:addEventListener("userInput", searchListenerCountry)
@@ -681,10 +885,16 @@ end
 
 -- scroll pane for useful contacts
 function addContactsToScroll(scroll, contactType, contactNum, num)
+  if contactType == "Emergency" then
+  	backgroundFile = "emergency.png"
+  elseif contactType == "Embassy" then
+  	backgroundFile = "embassy.png"
+  else
+  	backgroundFile = "noKinPhone.png"
+  end
   button = widget.newButton(
     {
       label = contactNum .. "\n" .. contactType,
-      shape = "roundedRect",
       cornerRadius = 0,
       fillColor = white,
       strokeWidth = 0,
@@ -692,6 +902,8 @@ function addContactsToScroll(scroll, contactType, contactNum, num)
       width = 300,
       x = display.contentWidth/2,
       y = (num * 80) + 30,
+	  fontSize = 14,
+	  defaultFile = backgroundFile
     }
   )
   scroll:insert(button)
@@ -699,17 +911,21 @@ function addContactsToScroll(scroll, contactType, contactNum, num)
 end
 
 function populateContacts ( scroll )
+  contactType = nil
   query = [[SELECT * FROM country WHERE id=]] .. currentCountryId
   for row in db:nrows(query) do
-    addContactsToScroll(scroll, "Emergency", row.emergency, 0)
+  	contactType = "Emergency"
+    addContactsToScroll(scroll, contactType, row.emergency, 0)
   end
+  contactType = "Embassy"
   query = [[SELECT * FROM country WHERE id=]] .. currentCountryId
   for row in db:nrows(query) do
-    addContactsToScroll(scroll, "Embassy", row.embassy, 1)
+    addContactsToScroll(scroll, contactType, row.embassy, 1)
   end
+  contactType = "Next of Kin"
   query = [[SELECT * FROM user WHERE userid=]] .. currentUserId
   for row in db:nrows(query) do
-    addContactsToScroll(scroll, "Next of Kin", row.nokname, 2)
+    addContactsToScroll(scroll, contactType, row.nokname, 2)
   end
 end
 contactsScroll = getScroll( "contacts" )
@@ -719,35 +935,55 @@ function addPhraseToScroll(scroll, row, num)
   button1 = display.newText(
     {
       text = row.english,
-      height = display.contentHeight/8.4,
-      width = display.contentWidth - 30,
-      x = display.contentWidth/2,
-      y = (num * 60) + 30
+      height = display.contentHeight/8,
+      width = display.contentWidth - 80,
+      x = display.contentWidth/2.3,
+      y = (num * 60) + 62,
+      fontSize = 14
     }
   )
   button2 = display.newText(
     {
       text = row.translated,
-      height = display.contentHeight/8.4,
-      width = display.contentWidth - 60,
+      height = display.contentHeight/9,
+      width = display.contentWidth - 80,
       x = display.contentWidth/2 + 30,
-      y = button1.y + display.contentHeight/8.4
+      y = button1.y + display.contentHeight/8.4,
+	  fontSize = 14
     }
   )
-  bg1 = display.newRect( button1.x, button1.y - 20, display.contentWidth, button1.height + 10 )
+  bg1 = display.newRect( button1.x, button1.y - 10, display.contentWidth + 40, button1.height - 10 )
   bg1:setFillColor(1,1,1)
-  bg2 = display.newRect( button2.x - 10, button2.y - 20, button2.width + 20, button2.height + 10 )
+  bg2 = display.newRect( button2.x , button2.y - 12.25, button2.width + 50, button1.height - 10 )
   bg2:setFillColor(1,1,1)
   button1:setFillColor(black)
   button2:setFillColor(black)
+  starIcon = display.newImage("star.png", button1.x + 120, button1.y - 20)
+  starIcon:scale(0.05, 0.05)
+  favourite = addButton( "favourite".. row.id , button1.x + 120, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
+  arrowImage = display.newImage("arrow-down-and-right.png", button1.x - 105, button1.y + 30 )
+  binPhraseIcon = display.newImage("recycle-bin.png", button1.x + 160, button1.y - 20)
+  binPhraseIcon:scale (0.75, 0.75)
+  binPhrase = addButton( "binPhrase".. row.id , button1.x + 160, button1.y - 20, 25, 25, "icon", binIcon ) --( ID, x, y, width, height, btnType, label )
   scroll:insert(bg1)
   scroll:insert(button1)
   scroll:insert(bg2)
   scroll:insert(button2)
+  scroll:insert(starIcon)
+  scroll:insert(favourite)
+  scroll:insert(arrowImage)
+  scroll:insert(binPhraseIcon)
+  scroll:insert(binPhrase)
+  
   table.insert(currentButtons, button1)
   table.insert(currentButtons, bg1)
   table.insert(currentButtons, button2)
   table.insert(currentButtons, bg2)
+  table.insert(currentButtons, starIcon)
+  table.insert(currentButtons, arrowImage)
+  table.insert(currentButtons, favourite)
+  table.insert(currentButtons, binPhraseIcon)
+  table.insert(currentButtons, binPhrase)
 end
 
 function populatePhrases( scroll, search, phraseType )
@@ -778,11 +1014,65 @@ phraseText = display.newText(
     x = display.contentWidth / 2,
     y = 80,
     width = display.contentWidth / 2,
-    fontSize = 20,
+    fontSize = 16,
     align = "center"
   }
 )
 phraseText:setFillColor( 1, 1, 1 )
+
+local phrasesGroup = display.newGroup()
+phrasesGroup:insert(phraseText)
+phrasesGroup:insert(addPhraseButton)
+
+-- User profile
+function addProfileToScroll(scroll, userDetailType, contact, num)
+  if contact ~= nil then
+    printLabel = userDetailType .. "\n" .. contact
+  else
+    printLabel = userDetailType .. "\nNot supplied" 
+  end
+  button = widget.newButton(
+    {
+      label = printLabel,
+      labelAlign = "left",
+      labelXOffset = 160,
+      shape = "roundedRect",
+      cornerRadius = 0,
+      fillColor = white,
+      strokeWidth = 0,
+      height = display.contentHeight/9,
+      width = display.contentWidth,
+      x = display.contentWidth/2,
+      y = (num * 53) + 30
+    }
+  )
+  button:toFront()
+  scroll:insert(button)
+  table.insert(currentButtons, button)
+end
+
+function populateProfile ( profileType, profileId, scroll )
+  if profileType == "user" then
+    query = [[SELECT * FROM user WHERE userid=]] .. profileId
+  else
+    query = [[SELECT * FROM lawyer WHERE id=]] .. profileId
+  end
+  for row in db:nrows(query) do
+    userImg = row.userpic
+    if userImg ~= nil then 
+      profileImg = display.newImage(userImg, display.contentWidth/2, display.contentHeight/4)
+      scroll:insert(profileImg)
+    else
+      print(userImg)
+    end
+    addProfileToScroll(scroll, "Name", row.name, 2)
+    addProfileToScroll(scroll, "Mobile", row.mobilenum, 4)
+    addProfileToScroll(scroll, "Work", row.worknum, 5)
+    addProfileToScroll(scroll, "E-mail", row.email, 6)
+    scroll:insert(button)
+  end
+  table.insert(currentButtons, scroll)
+end
 
 -- Current Country display group (inc button)
 
@@ -869,6 +1159,11 @@ registrationButtons = {
 	txtKinMobile
 }
 
+profileButtons = {
+  countryGroup,
+  profileScroll
+}
+
 localLawyerButtons = {
     addLawyerButton,
     addButton( 14, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "lawyerAdd", addLawyerButton),
@@ -878,11 +1173,11 @@ localLawyerButtons = {
 }
 
 addLawyerButtons = {
-	addButton( 15, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
+  addButton( 15, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
   addButton( 16, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
   backaddLawyer,
 	txtaddLawyer,
-  backaddLawyerEmail,
+	backaddLawyerEmail,
 	inputaddLawyerEmail,
 	txtaddLawyerEmail,
 	backaddLawyerFname,
@@ -894,8 +1189,8 @@ addLawyerButtons = {
 	backaddLawyerMobile,
 	inputaddLawyerMobile,
 	txtaddLawyerMobile,
-	backaddLawyerCountry,
-	txtaddLawyerCountry,
+	backstaticCountry,
+	txtstaticCountry,
 }
 
 countryButtons = {
@@ -909,10 +1204,33 @@ contactsButtons = {
 }
 
 phraseButtons = {
-  countryGroup,
-  phraseScroll,
-  phraseText,
-  phraseRectangle
+  addButton( 17, addLawyerButton.x,addLawyerButton.y,0.5*display.contentWidth,26, "phraseAdd", addPhraseButton),
+	countryGroup,
+	phraseScroll,
+	phraseText,
+	phraseRectangle,
+	addPhraseButton
+}
+
+addPhraseButtons = {
+	addButton( 18, display.contentWidth/2, 7.55*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "", 'Confirm'),
+    addButton( 19, display.contentWidth/2, 8.3*display.contentHeight/8, display.contentWidth/2, display.contentHeight/15, "",  'Back'),
+		backaddPhrase,
+		txtaddPhrase,
+		backaddPhraseEnglish,
+		txtaddPhraseEnglish,
+		inputaddPhraseEnglish,
+		backaddPhraseTrans,
+		txtaddPhraseTrans,
+		inputaddPhraseTrans,
+		backstaticCountry,
+		txtstaticCountry,
+		radioUsefulPhrase,
+		radioLegalPhrase,
+		backradioPhrase,
+		txtaddUsefulPhrase,
+		txtaddLegalPhrase,
+		radioPhraseGroup
 }
 
 function showButtons(buttons)
@@ -935,6 +1253,9 @@ hideButtons(countryButtons)
 hideButtons(phraseMenuButtons)
 hideButtons(menuBarButtons)
 hideButtons(localLawyerButtons)
-showButtons(loginButtons)
 hideButtons(mainMenuButtons)
 hideButtons(registrationButtons)
+hideButtons(addPhraseButtons)
+hideButtons(contactsButtons)
+hideButtons(profileButtons)
+showButtons(loginButtons)
