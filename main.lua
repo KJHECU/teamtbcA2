@@ -11,6 +11,7 @@ background.anchorX = 0
 background.anchorY = 0
 background:scale(0.45, 0.72)
 
+local reg = require( "registration.lua" )
 local widget = require( "widget" )
 local sqlite3 = require( "sqlite3" )
 local path = system.pathForFile( "data.db", system.ResourceDirectory )
