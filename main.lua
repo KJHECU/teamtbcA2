@@ -6,7 +6,6 @@
 -- required for unit tests
 require "lunatest"
 
-
 -- background image properties
 
 local background = display.newImage("background.jpg")
@@ -1257,3 +1256,8 @@ hideButtons(menuBarButtons)
 hideButtons(localLawyerButtons)
 hideButtons(mainMenuButtons)
 hideButtons(registrationButtons)
+
+-- uncomment next two lines to run unit tests
+
+--lunatest.suite("unit_tests")
+--lunatest.run()
