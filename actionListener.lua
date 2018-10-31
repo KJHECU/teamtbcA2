@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 -- Listener for button presses
+
 function handleInput( event )
   id = event.target.id
   print("button push " .. id)
@@ -39,6 +40,7 @@ function handleInput( event )
   elseif id == 6 then
     hideButtons(mainMenuButtons)
     showButtons(contactsButtons)
+    contactsScroll = getScroll("contacts")
     populateContacts(contactsScroll)
     contactsScroll.isVisible = true
   elseif id == 7 then
