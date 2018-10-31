@@ -39,6 +39,7 @@ function handleInput( event )
   elseif id == 6 then
     hideButtons(mainMenuButtons)
     showButtons(contactsButtons)
+    contactsScroll = getScroll("contacts")
     populateContacts(contactsScroll)
     contactsScroll.isVisible = true
   elseif id == 7 then
