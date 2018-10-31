@@ -35,4 +35,5 @@ In Summary:
 1. Configure the online repository KJHECU/teamtbcA2 through GITHUB desktop
 2. Fetch the code from master branch (retrieves the code from the overarching branch in the online repository)
 3. Open the Corona SDK simulator and select to Open a project
-4. Navigate to 
+4. In the Corona SDK simulator, Navigate through the local directory to the location GITHUB was 
+installed open the directory and select the main.lua file
