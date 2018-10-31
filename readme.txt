@@ -27,7 +27,7 @@ and is available free at https://desktop.github.com/
 
 In Summary:
 - Download and Install Corona SDK simulator
-- Download and Installed SB Browser for SQL lite
+- Download and Install SB Browser for SQL lite
 - Download and Install Desktop GITHUB
 
 // Opening and Running source code
