@@ -223,6 +223,10 @@ hideButtons(menuBarButtons)
 hideButtons(localLawyerButtons)
 hideButtons(mainMenuButtons)
 hideButtons(registrationButtons)
+hideButtons(addPhraseButtons)
+hideButtons(contactsButtons)
+hideButtons(profileButtons)
+showButtons(loginButtons)
 
 -- uncomment next two lines to run unit tests
 
