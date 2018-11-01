@@ -3,10 +3,12 @@
 -- main.lua
 --
 -----------------------------------------------------------------------------------------
+-- required for unit tests
+require "lunatest"
 
 -- background image properties
 
-local background = display.newImage("Background.jpg")
+local background = display.newImage("background.jpg")
 background.anchorX = 0
 background.anchorY = 0
 background:scale(0.45, 0.72)
@@ -225,3 +227,8 @@ hideButtons(addPhraseButtons)
 hideButtons(contactsButtons)
 hideButtons(profileButtons)
 showButtons(loginButtons)
+
+-- uncomment next two lines to run unit tests
+
+--lunatest.suite("unit_tests")
+--lunatest.run()

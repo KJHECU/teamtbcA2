@@ -50,11 +50,11 @@ function handleInput( event )
     phraseScroll.isVisible = true
     showButtons(phraseButtons)
     showButtons(menuBarButtons)
-	if userType == 1 then
-		 addPhraseButton.isVisible = true
-		else
-		 addPhraseButton.isVisible = false
-		end
+    if userType == 1 then
+      addPhraseButton.isVisible = true
+    else
+      addPhraseButton.isVisible = false
+    end
   elseif id == 8 then
     hideButtons(phraseMenuButtons)
     phraseText.text = "Legal Phrases"
@@ -67,6 +67,13 @@ function handleInput( event )
 		else
 		 addPhraseButton.isVisible = false
 		end
+  elseif id == 9 then
+    hideButtons(currentButtons)
+    showButtons(menuBarButtons)
+    showButtons(phraseButtons)
+    addPhraseButton.isVisible = false
+    phraseText.text = "Favourite phrases"
+    populatePhrases(phraseScroll, nil, "favourite")
   elseif id == 10 then
     if loginAccepted() then
       hideButtons(loginButtons)
@@ -112,7 +119,7 @@ function handleInput( event )
   elseif id == 18 then
     if addPhraseValid() then
      addNewPhrase()
-	 hideButtons(currentButtons)
+    hideButtons(currentButtons)
      showButtons(phraseMenuButtons)
   end  
   elseif id == 19 then
@@ -120,10 +127,14 @@ function handleInput( event )
     showButtons(phraseMenuButtons)
 	showButtons(menuBarButtons)
   elseif string.starts(id,"binPhrase") then
-    deletePhrase(id)
-	hideButtons(currentButtons)
+    if phraseText.text == "Favourite phrases" then
+      removeFavourite(id)
+    else
+      deletePhrase(id)
+    end
+    hideButtons(currentButtons)
     showButtons(phraseMenuButtons)
-	showButtons(menuBarButtons)
+    showButtons(menuBarButtons)
   elseif string.starts(id,"binLawyer") then
 	print("hitting this")
     deleteLawyer(id)
@@ -154,5 +165,7 @@ function handleInput( event )
     showButtons(menuBarButtons)
     populateProfile("lawyer", id:sub(7), profileScroll)
     profileScroll.isVisible = true
+  elseif string.starts(id, "favourite") then
+    addFavourite(id:sub(10))
   end
 end

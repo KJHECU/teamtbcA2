@@ -155,19 +155,34 @@ radioPhraseGroup:insert( radioUsefulPhrase )
 
 -- Populates phrase list from db
 function populatePhrases( scroll, search, phraseType )
-  if search == nil then
-    query = [[SELECT * FROM phrase WHERE countryid=]] .. currentCountryId .. [[ AND phrasetype=]] .. phraseType
+  if phraseType == "favourite" then
+    favourites = {}
+    query = [[SELECT * FROM favourite WHERE userid=]] .. currentUserId .. [[ AND countryid=]] .. currentCountryId
+    for row in db:nrows(query) do
+      table.insert(favourites, row.phraseid)
+    end
+    i = 0
+    for f in pairs(favourites) do
+      query = [[SELECT * FROM phrase WHERE id=]] .. favourites[f]
+      for row in db:nrows(query) do
+        addPhraseToScroll(scroll, row, i)
+        i = i + 2
+      end
+    end
   else
-    query = [[SELECT * FROM phrase WHERE UPPER(english) LIKE "%]]
-    .. search:upper() .. [[%" AND countryid=]] .. currentCountryId
-    .. [[ AND phrasetype=]] .. phraseType
-  end
-  query = query .. [[ ORDER BY english ASC]]
-  print("Query = " .. query)
-  i = 0
-  for row in db:nrows(query) do
-    addPhraseToScroll(scroll, row, i)
-    i = i + 2
+    if search == nil then
+      query = [[SELECT * FROM phrase WHERE countryid=]] .. currentCountryId .. [[ AND phrasetype=]] .. phraseType
+    else
+      query = [[SELECT * FROM phrase WHERE UPPER(english) LIKE "%]]
+      .. search:upper() .. [[%" AND countryid=]] .. currentCountryId
+      .. [[ AND phrasetype=]] .. phraseType
+    end
+    query = query .. [[ ORDER BY english ASC]]
+    i = 0
+    for row in db:nrows(query) do
+      addPhraseToScroll(scroll, row, i)
+      i = i + 2
+    end
   end
 end
 
@@ -220,4 +235,17 @@ function deletePhrase(id)
 	 query = [[DELETE FROM phrase WHERE id=]] .. phraseID
 	 db:exec(query)
 	 print(query)
+end
+
+-- adds phrase to favourites
+function addFavourite(id)
+  query = [[INSERT INTO favourite (userid, phraseid, countryid) VALUES (]] .. currentUserId .. [[, ]] .. id .. [[, ]] .. currentCountryId .. [[);]]
+  db:exec(query)
+  print(query)
+end
+
+function removeFavourite(id)
+  phraseID = string.sub(id, 10)
+  query = [[DELETE FROM favourite WHERE phraseid=]] .. phraseID .. [[ AND userid=]] .. currentUserId
+  db:exec(query)
 end
