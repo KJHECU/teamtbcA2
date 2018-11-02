@@ -90,11 +90,9 @@ function addPhraseToScroll(scroll, row, num)
   starIcon:scale(0.05, 0.05)
   favourite = addButton( "favourite".. row.id , button1.x + 120, button1.y - 20, 25, 25, "icon", starIcon ) --( ID, x, y, width, height, btnType, label )
   arrowImage = display.newImage("arrow-down-and-right.png", button1.x - 105, button1.y + 30 )
-  if userType == 1 then
-    binPhraseIcon = display.newImage("recycle-bin.png", button1.x + 160, button1.y - 20)
-    binPhraseIcon:scale (0.75, 0.75)
-    binPhrase = addButton( "binPhrase".. row.id , button1.x + 160, button1.y - 20, 25, 25, "icon", binIcon ) --( ID, x, y, width, height, btnType, label )
-  end
+  binPhraseIcon = display.newImage("recycle-bin.png", button1.x + 160, button1.y - 20)
+  binPhraseIcon:scale (0.75, 0.75)
+  binPhrase = addButton( "binPhrase".. row.id , button1.x + 160, button1.y - 20, 25, 25, "icon", binIcon ) --( ID, x, y, width, height, btnType, label )
   scroll:insert(bg1)
   scroll:insert(button1)
   scroll:insert(bg2)
@@ -102,12 +100,8 @@ function addPhraseToScroll(scroll, row, num)
   scroll:insert(starIcon)
   scroll:insert(favourite)
   scroll:insert(arrowImage)
-  if userType == 1 then
-    scroll:insert(binPhraseIcon)
-    scroll:insert(binPhrase)
-    table.insert(currentButtons, binPhraseIcon)
-    table.insert(currentButtons, binPhrase)
-  end
+  scroll:insert(binPhraseIcon)
+  scroll:insert(binPhrase)
   table.insert(currentButtons, button1)
   table.insert(currentButtons, bg1)
   table.insert(currentButtons, button2)
@@ -115,6 +109,8 @@ function addPhraseToScroll(scroll, row, num)
   table.insert(currentButtons, starIcon)
   table.insert(currentButtons, arrowImage)
   table.insert(currentButtons, favourite)
+  table.insert(currentButtons, binPhraseIcon)
+  table.insert(currentButtons, binPhrase)
 end
 
 backradioPhrase = display.newRect(display.contentWidth/2, display.contentHeight/2.5, display.contentWidth, display.contentHeight/15)
@@ -159,34 +155,19 @@ radioPhraseGroup:insert( radioUsefulPhrase )
 
 -- Populates phrase list from db
 function populatePhrases( scroll, search, phraseType )
-  if phraseType == "favourite" then
-    favourites = {}
-    query = [[SELECT * FROM favourite WHERE userid=]] .. currentUserId .. [[ AND countryid=]] .. currentCountryId
-    for row in db:nrows(query) do
-      table.insert(favourites, row.phraseid)
-    end
-    i = 0
-    for f in pairs(favourites) do
-      query = [[SELECT * FROM phrase WHERE id=]] .. favourites[f]
-      for row in db:nrows(query) do
-        addPhraseToScroll(scroll, row, i)
-        i = i + 2
-      end
-    end
+  if search == nil then
+    query = [[SELECT * FROM phrase WHERE countryid=]] .. currentCountryId .. [[ AND phrasetype=]] .. phraseType
   else
-    if search == nil then
-      query = [[SELECT * FROM phrase WHERE countryid=]] .. currentCountryId .. [[ AND phrasetype=]] .. phraseType
-    else
-      query = [[SELECT * FROM phrase WHERE UPPER(english) LIKE "%]]
-      .. search:upper() .. [[%" AND countryid=]] .. currentCountryId
-      .. [[ AND phrasetype=]] .. phraseType
-    end
-    query = query .. [[ ORDER BY english ASC]]
-    i = 0
-    for row in db:nrows(query) do
-      addPhraseToScroll(scroll, row, i)
-      i = i + 2
-    end
+    query = [[SELECT * FROM phrase WHERE UPPER(english) LIKE "%]]
+    .. search:upper() .. [[%" AND countryid=]] .. currentCountryId
+    .. [[ AND phrasetype=]] .. phraseType
+  end
+  query = query .. [[ ORDER BY english ASC]]
+  print("Query = " .. query)
+  i = 0
+  for row in db:nrows(query) do
+    addPhraseToScroll(scroll, row, i)
+    i = i + 2
   end
 end
 
@@ -239,17 +220,4 @@ function deletePhrase(id)
 	 query = [[DELETE FROM phrase WHERE id=]] .. phraseID
 	 db:exec(query)
 	 print(query)
-end
-
--- adds phrase to favourites
-function addFavourite(id)
-  query = [[INSERT INTO favourite (userid, phraseid, countryid) VALUES (]] .. currentUserId .. [[, ]] .. id .. [[, ]] .. currentCountryId .. [[);]]
-  db:exec(query)
-  print(query)
-end
-
-function removeFavourite(id)
-  phraseID = string.sub(id, 10)
-  query = [[DELETE FROM favourite WHERE phraseid=]] .. phraseID .. [[ AND userid=]] .. currentUserId
-  db:exec(query)
 end

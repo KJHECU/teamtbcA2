@@ -113,13 +113,15 @@ function addButtonToScroll(scroll, row, num)
   if scroll == lawyerScroll then
     scroll:insert(button)
     table.insert(currentButtons, button)
-    binLawyerIcon = display.newImage("recycle-bin.png", button.x + 120, button.y )
-    binLawyerIcon:scale (0.75, 0.75)
-    binLawyer = addButton( "binLawyer".. row.id , button.x + 120, button.y , 25, 25, "icon", binLawyerIcon ) --( ID, x, y, width, height, btnType, label )
-    scroll:insert(binLawyerIcon)
-    scroll:insert(binLawyer)
-    table.insert(currentButtons, binLawyerIcon)
-    table.insert(currentButtons, binLawyer)
+    if userType == 1 then
+      binLawyerIcon = display.newImage("recycle-bin.png", button.x + 120, button.y )
+      binLawyerIcon:scale (0.75, 0.75)
+      binLawyer = addButton( "binLawyer".. row.id , button.x + 120, button.y , 25, 25, "icon", binLawyerIcon ) --( ID, x, y, width, height, btnType, label )
+      scroll:insert(binLawyerIcon)
+      scroll:insert(binLawyer)
+      table.insert(currentButtons, binLawyerIcon)
+      table.insert(currentButtons, binLawyer)
+    end
   else
 	  scroll:insert(button)
 	  table.insert(currentButtons, button)
