@@ -39,4 +39,4 @@ In Summary:
 installed open the directory and select the main.lua file
 5. To access the application in a simulated environment use
    User: a Password: a for admin test purposes
-   User: User@user.com Password: user for general user purposes OR create and register an account
+   User: User@user.com Password: user for general user purposes OR create and register an account (general user)
