@@ -34,9 +34,19 @@ In Summary:
 
 1. Configure the online repository KJHECU/teamtbcA2 through GITHUB desktop
 2. Fetch the code from master branch (retrieves the code from the overarching branch in the online repository)
-3. Open the Corona SDK simulator and select to Open a project
-4. In the Corona SDK simulator, Navigate through the local directory to the location GITHUB was 
+3. Open the Corona SDK simulator and select to Open a project, and
+4. In the Corona SDK simulator, navigate through the local directory to the location GITHUB was 
 installed open the directory and select the main.lua file
-5. To access the application in a simulated environment use
+5. To access the application in the simulated environment use
+   User: a Password: a for admin test purposes
+   User: User@user.com Password: user for general user purposes OR create and register an account (general user)
+
+Alternatively (using the source code provided in the BlackBoard submission)
+
+1. Download the KJHECU/teamtbcA2 folder to the local device
+2. Open the Corona SDK simulator and select to Open a project, and
+3. In the Corona SDK simulator, navigate through the local directory to the KJHECU/teamtbcA2 folder was 
+installed open the directory and select the main.lua file
+4. To access the application in the simulated environment use
    User: a Password: a for admin test purposes
    User: User@user.com Password: user for general user purposes OR create and register an account (general user)
